@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "japanese-novel-ruby",
+	"name": "Japanese Novel Ruby",
 	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"minAppVersion": "1.4.0",
+	"description": "Obsidian plugin for display & insert ruby ​​marks commonly used in Japanese novels",
+	"author": "quels <@k-quels>",
+	"authorUrl": "https://kuma.quels.net/",
+	"fundingUrl": "https://buymeacoffee.com/quels",
 	"isDesktopOnly": false
 }
