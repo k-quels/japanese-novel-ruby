@@ -16,6 +16,7 @@ Format example:
 ## What you can do with this plugin
 
 
+<img width="500" alt="JapaneseNovelRuby_sample" src="https://github.com/user-attachments/assets/8e93c4e2-fef5-489e-84a8-e523f7e8f25d">
 
 
 
