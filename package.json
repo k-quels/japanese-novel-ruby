@@ -1,6 +1,6 @@
 {
 	"name": "japanese-novel-ruby",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Treat ruby(Furigana) ​​marks commonly used in Japanese novels.",
 	"main": "main.js",
 	"scripts": {
