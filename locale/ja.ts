@@ -10,7 +10,6 @@ export default {
 
 	notice_insert_novel_dot_no_selection: "先に傍点を振りたい本文を選択してください",
 
-	settings_view_title   : "表示",
 	settings_command_title: "コマンド",
 	settings_support_title: "サポート",
 

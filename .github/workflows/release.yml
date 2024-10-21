@@ -24,23 +24,17 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: Get Version
-        id: version
+      - name: Package & Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            echo "TAG_NAME=$(git tag --sort version:refname | tail -n 1)" >> "$GITHUB_OUTPUT"
-      - name: Package into a zip
-        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+
           mkdir ${{ env.PLUGIN_NAME }}
           cp main.js manifest.json ${{ env.PLUGIN_NAME }}
-          zip -r ${{ env.PLUGIN_NAME }}-${{ steps.version.outputs.TAG_NAME }}.zip ${{ env.PLUGIN_NAME }}
-      - name: Create Release And Upload
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            main.js
-            manifest.json
-            ${{ env.PLUGIN_NAME }}-${{ steps.version.outputs.TAG_NAME }}.zip
-          token: ${{ secrets.GITHUB_TOKEN }}
-          draft: false
-          prerelease: false
-          make_latest: true
+          zip -r ${{ env.PLUGIN_NAME }}-$tag.zip ${{ env.PLUGIN_NAME }}
+
+          gh release create "$tag" \
+            --title="$tag" \
+            --draft \
+            main.js manifest.json ${{ env.PLUGIN_NAME }}-$tag.zip

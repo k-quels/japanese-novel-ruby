@@ -16,8 +16,6 @@ export class NovelRubySettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h1", { text: t("settings_view_title") });
-
 		new Setting(containerEl)
 			.setName(t("settings_source_mode_render_name"))
 			.setDesc(t("settings_source_mode_render_desc"))
@@ -28,7 +26,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 		
-		containerEl.createEl("h1", { text: t("settings_command_title") });
+		new Setting(containerEl).setName(t("settings_command_title")).setHeading();
 
 		new Setting(containerEl)
 			.setName(t("settings_insert_full_width_separator_name"))
@@ -50,7 +48,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 		
-		containerEl.createEl("h1", { text: t("settings_support_title") });
+		new Setting(containerEl).setName(t("settings_support_title")).setHeading();
 		
 		new Setting(containerEl)
 			.setName(t("settings_donate_name"))

@@ -10,7 +10,6 @@ export default {
 
 	notice_insert_novel_dot_no_selection: "Selection is required to insert dots",
 
-	settings_view_title	  : "View",
 	settings_command_title: "Command",
 	settings_support_title: "Support",
 	
