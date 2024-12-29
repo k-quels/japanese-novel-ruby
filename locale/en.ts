@@ -15,6 +15,8 @@ export default {
 	
 	settings_source_mode_render_name			: "Enable ruby preview in source mode",
 	settings_source_mode_render_desc			: "Turn off if you want to display ruby marks as is in source mode.",
+	settings_ruby_size_name						: "Ruby size",
+	settings_ruby_size_desc						: "Set the ratio of ruby size to body. (default: 0.5)",
 	settings_insert_full_width_separator_name	: "Insert full-width \"｜\" by insert-ruby command",
 	settings_insert_full_width_separator_desc	: "Turn off if you want to insert half-width \"|\" by ruby insert dialog. Does not affect rendering.",
 	settings_emphashis_dot_name					: "Emphasis dot character",

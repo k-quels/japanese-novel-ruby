@@ -26,6 +26,18 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 		
+		new Setting(containerEl)
+			.setName(t("settings_ruby_size_name"))
+			.setDesc(t("settings_ruby_size_desc"))
+			.addText(text => text
+				.setValue(String(this.plugin.settings.rubySize))
+				.setPlaceholder("0.5")
+				.onChange(async (value) => {
+					const saveValue : number = Number(value) ? Number(value) : 0.5;
+					this.plugin.settings.rubySize = saveValue;
+					await this.plugin.saveSettings();
+				}));
+		
 		new Setting(containerEl).setName(t("settings_command_title")).setHeading();
 
 		new Setting(containerEl)

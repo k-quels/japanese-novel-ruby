@@ -15,6 +15,8 @@ export default {
 
 	settings_source_mode_render_name			: "ソースモードでルビを表示",
 	settings_source_mode_render_desc			: "ソースモードではルビ記号を入力したままの文字として表示したい場合、オフにしてください",
+	settings_ruby_size_name						: "ルビのサイズ",
+	settings_ruby_size_desc						: "本文に対するルビの大きさを比率で指定します (デフォルト: 0.5)",
 	settings_insert_full_width_separator_name	: "「ルビを挿入」コマンドで全角の \"｜\" を使う",
 	settings_insert_full_width_separator_desc	: "コマンドで半角の \"|\" を挿入したい場合、オフにしてください　※表示には影響しません",
 	settings_emphashis_dot_name					: "傍点の文字",

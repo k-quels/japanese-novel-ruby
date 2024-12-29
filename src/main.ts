@@ -13,13 +13,15 @@ export const RUBY_REGEXP = /(?:(?:[|｜]?(?<body1>[一-龠]+?))|(?:[|｜](?<body
 interface NovelRubyPluginSettings {
 	sourceModeRendering: boolean,
 	insertFullWidthMark: boolean,
-	emphasisDot: string
+	emphasisDot: string,
+	rubySize: number
 }
 
 const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 	sourceModeRendering: true,
 	insertFullWidthMark: true,
-	emphasisDot: '・'
+	emphasisDot: '・',
+	rubySize: 0.5
 }
 
 export default class NovelRubyPlugin extends Plugin {
@@ -83,10 +85,12 @@ export default class NovelRubyPlugin extends Plugin {
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		updateRubySize(this.settings.rubySize);
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		updateRubySize(this.settings.rubySize);
 		// Flush the changes to all editors
 		this.app.workspace.updateOptions();
 	}
@@ -156,4 +160,11 @@ export class RubyInsertModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 	}
+}
+
+/**
+ * Update ruby size style
+ */
+function updateRubySize(rubySize: number) {
+	activeDocument.body.style.setProperty("--ruby-size", `${rubySize}`);
 }
