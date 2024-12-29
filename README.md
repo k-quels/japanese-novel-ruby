@@ -1,5 +1,7 @@
 # Japanese Novel Ruby Plugin for Obsidian
 
+English | [日本語](README_ja.md)
+
 Obsidian plugin for display & insert ruby(Furigana) ​​marks commonly used in Japanese novels.
 
 The ruby syntax of this plugin is a format widely used by Japanese novel web sites, such as 「青空文庫」「小説家になろう」 and others.
