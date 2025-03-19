@@ -12,7 +12,13 @@ export default {
 
 	settings_command_title: "Command",
 	settings_support_title: "Support",
-	
+
+	settings_start_character_ruby_name: "Start ruby character",
+	settings_start_character_ruby_desc: "The character to replace 《",
+	settings_end_character_ruby_name: "End ruby character",
+	settings_end_character_ruby_desc: "The character to replace 》",
+	settings_hide_ruby_unless_hover_name: "Hide ruby unless hover",
+	settings_hide_ruby_unless_hover_desc: "Hides the ruby upper text unless hovered",
 	settings_source_mode_render_name			: "Enable ruby preview in source mode",
 	settings_source_mode_render_desc			: "Turn off if you want to display ruby marks as is in source mode.",
 	settings_ruby_size_name						: "Ruby size",

@@ -2,3 +2,11 @@ ruby > rt {
 	font-size: 100%;
 	zoom: var(--ruby-size);
 }
+
+ruby.ruby-hide rt {
+	display: none;
+}
+
+ruby.ruby-hide:hover rt {
+	display: ruby-text;
+}

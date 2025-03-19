@@ -1,18 +1,31 @@
-import { App, Editor, MarkdownView, Modal, Plugin, Setting, MarkdownPostProcessor, Notice } from 'obsidian';
+import {App, Editor, MarkdownView, Modal, Plugin, Setting, Notice} from 'obsidian';
 
-import { novelRubyPostProcessor } from 'src/NovelRubyPostProcessor';
-import { novelRubyExtension } from 'src/NovelRubyViewPlugin';
-import { NovelRubySettingTab } from './NovelRubySettingTab';
+import {novelRubyPostProcessor} from 'src/NovelRubyPostProcessor';
+import {novelRubyExtension} from 'src/NovelRubyViewPlugin';
+import {NovelRubySettingTab} from './NovelRubySettingTab';
 import t from "./l10n";
 
 // Regular expression for japanese novel ruby
 // format type 1 (without prefix): (漢字)(《ふりがな》)
 // format type 2 (with prefix)   : (| or ｜)(any characters except | or ｜)(《ふりがな》)
-export const RUBY_REGEXP = /(?:(?:[|｜]?(?<body1>[一-龠]+?))|(?:[|｜](?<body2>[^|｜]+?)))《(?<ruby>.+?)》/gm;
+export class RubyRegex {
+	static RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》");
 
-interface NovelRubyPluginSettings {
+	static createRubyRegexp(start: string, end: string) {
+		return new RegExp(`(?:(?:[|｜]?(?<body1>[一-龠]+?))|(?:[|｜](?<body2>[^|｜]+?)))${start}(?<ruby>.+?)${end}`, 'gm');
+	};
+
+	static changeRubyRegexp(start: string, end: string) {
+		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp(start, end);
+	}
+}
+
+export interface NovelRubyPluginSettings {
 	sourceModeRendering: boolean,
 	insertFullWidthMark: boolean,
+	startRubyCharacter: string,
+	endRubyCharacter: string,
+	hideRuby: boolean,
 	emphasisDot: string,
 	rubySize: number
 }
@@ -20,18 +33,20 @@ interface NovelRubyPluginSettings {
 const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 	sourceModeRendering: true,
 	insertFullWidthMark: true,
+	startRubyCharacter: "《",
+	endRubyCharacter: "》",
+	hideRuby: false,
 	emphasisDot: '・',
 	rubySize: 0.5
 }
 
 export default class NovelRubyPlugin extends Plugin {
 	settings: NovelRubyPluginSettings;
-	public rubyPostProcessor: MarkdownPostProcessor = novelRubyPostProcessor;
 
 	async onload() {
 		await this.loadSettings();
-
-		this.registerMarkdownPostProcessor(this.rubyPostProcessor); // affect to reading view
+		RubyRegex.changeRubyRegexp(this.settings.startRubyCharacter, this.settings.endRubyCharacter);
+		this.registerMarkdownPostProcessor((el, ctx) => novelRubyPostProcessor(el, ctx, this.settings));
 		this.registerEditorExtension(novelRubyExtension(this.app, this)); // affect to editor (source or live-preview)
 
 		// Display ruby insert modal
@@ -103,7 +118,7 @@ export default class NovelRubyPlugin extends Plugin {
  */
 function removeRuby(inputText: string): string {
 	let outputText: string = inputText;
-	const matches = Array.from(inputText.matchAll(RUBY_REGEXP));
+	const matches = Array.from(inputText.matchAll(RubyRegex.RUBY_REGEXP));
 	for (const match of matches) {
 		const body = match.groups?.body1 ? match.groups!.body1 : match.groups!.body2;
 		outputText = outputText.replace(match[0], body);
@@ -117,18 +132,18 @@ function removeRuby(inputText: string): string {
 export class RubyInsertModal extends Modal {
 	body: string;
 	ruby: string;
-	onSubmit: (body: string, ruby:string) => void;
+	onSubmit: (body: string, ruby: string) => void;
 
-	constructor(app: App, defaultBody: string, onSubmit: (body: string, ruby:string) => void) {
+	constructor(app: App, defaultBody: string, onSubmit: (body: string, ruby: string) => void) {
 		super(app);
 		this.onSubmit = onSubmit;
 		this.body = defaultBody;
 	}
 
 	onOpen() {
-		const { contentEl } = this;
+		const {contentEl} = this;
 
-		contentEl.createEl("h1", { text: t("ruby_insert_modal_title") });
+		contentEl.createEl("h1", {text: t("ruby_insert_modal_title")});
 
 		new Setting(contentEl)
 			.setName(t("ruby_insert_modal_body"))
@@ -157,7 +172,7 @@ export class RubyInsertModal extends Modal {
 	}
 
 	onClose() {
-		const { contentEl } = this;
+		const {contentEl} = this;
 		contentEl.empty();
 	}
 }
