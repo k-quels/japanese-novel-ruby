@@ -27,7 +27,8 @@ export interface NovelRubyPluginSettings {
 	endRubyCharacter: string,
 	hideRuby: boolean,
 	emphasisDot: string,
-	rubySize: number
+	rubySize: number,
+	enablePerNote: boolean
 }
 
 const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
@@ -37,7 +38,8 @@ const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 	endRubyCharacter: "》",
 	hideRuby: false,
 	emphasisDot: '・',
-	rubySize: 0.5
+	rubySize: 0.5,
+	enablePerNote: false // Disable by default
 }
 
 export default class NovelRubyPlugin extends Plugin {
@@ -46,7 +48,11 @@ export default class NovelRubyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		RubyRegex.changeRubyRegexp(this.settings.startRubyCharacter, this.settings.endRubyCharacter);
-		this.registerMarkdownPostProcessor((el, ctx) => novelRubyPostProcessor(el, ctx, this.settings));
+
+		this.registerMarkdownPostProcessor((el, ctx) => {
+			novelRubyPostProcessor(el, ctx, this.settings);
+		});
+
 		this.registerEditorExtension(novelRubyExtension(this.app, this)); // affect to editor (source or live-preview)
 
 		// Display ruby insert modal

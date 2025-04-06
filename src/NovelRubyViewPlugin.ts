@@ -5,6 +5,25 @@ import {editorLivePreviewField} from 'obsidian';
 
 import NovelRubyPlugin, {RubyRegex} from "./main";
 
+function shouldEnableForNote(plugin: NovelRubyPlugin, view : EditorView): boolean {
+	const viewVerified = plugin.settings.sourceModeRendering || view.state.field(editorLivePreviewField);
+
+	if (!plugin.settings.enablePerNote) {
+		
+		return viewVerified;
+	}
+
+	const activeFile = this.app.workspace.getActiveFile();
+	if (!activeFile) {
+		return false; // 如果没有活动文件，则功能不生效
+	}
+	const frontmatter = this.app.metadataCache.getFileCache(activeFile)?.frontmatter;
+	if (frontmatter && frontmatter["enable_ruby"] !== undefined) {
+		return frontmatter["enable_ruby"] === true && viewVerified;
+	}
+	return false;
+}
+
 /**
 	Tag insert widget for View Plugin
  */
@@ -31,10 +50,12 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 	return ViewPlugin.fromClass(class {
 		decorations: DecorationSet;
 		sourceModeRendering: boolean; // needs to detect setting change
+		perNoteEnable: boolean; // needs to detect per note setting change
 
 		constructor(view: EditorView) {
 			this.decorations = this.updateDecorations(view);
 			this.sourceModeRendering = plugin.settings.sourceModeRendering;
+			this.perNoteEnable = plugin.settings.enablePerNote;
 		}
 
 		update(update: ViewUpdate) {
@@ -55,7 +76,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 		 * Set up DecorationSet with setting & mode check
 		 */
 		private updateDecorations(view: EditorView): DecorationSet {
-			if (plugin.settings.sourceModeRendering || view.state.field(editorLivePreviewField)) {
+			if (shouldEnableForNote(plugin, view)) {
 				return this.buildDecorations(view);
 			} else {
 				return Decoration.none;

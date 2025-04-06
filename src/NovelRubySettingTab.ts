@@ -17,6 +17,16 @@ export class NovelRubySettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
+			.setName(t("settings_enable_pernote_name"))
+			.setDesc(t("settings_enable_pernote_desc"))
+			.addToggle(text => text
+				.setValue(this.plugin.settings.enablePerNote)
+				.onChange(async (value) => {
+					this.plugin.settings.enablePerNote = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
 			.setName(t("settings_source_mode_render_name"))
 			.setDesc(t("settings_source_mode_render_desc"))
 			.addToggle(text => text

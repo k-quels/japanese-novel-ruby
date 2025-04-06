@@ -20,6 +20,9 @@ export default {
 	settings_hide_ruby_unless_hover_name: "Hide ruby unless hover",
 	settings_hide_ruby_unless_hover_desc: "Hides the ruby upper text unless hovered",
 	
+	settings_enable_pernote_name: "Only Enable ruby for specific notes",
+	settings_enable_pernote_desc: "Enable ruby functionality only for specific note with property 'enable_ruby: true'",
+
 	settings_source_mode_render_name			: "Enable ruby preview in source mode",
 	settings_source_mode_render_desc			: "Turn off if you want to display ruby marks as is in source mode.",
 	settings_ruby_size_name						: "Ruby size",

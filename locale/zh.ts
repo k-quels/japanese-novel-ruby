@@ -20,6 +20,9 @@ export default {
 	settings_hide_ruby_unless_hover_name: "只在悬停时显示注音",
 	settings_hide_ruby_unless_hover_desc: "悬停时显示注音，其他时间隐藏注音",
 	
+	settings_enable_pernote_name: "只为特定笔记启用注音",
+	settings_enable_pernote_desc: "仅在特定笔记（笔记属性中配置 enable_ruby: true）启用注音",
+
 	settings_source_mode_render_name			: "在源码模式下显示注音",
 	settings_source_mode_render_desc			: "如果希望在源码模式下以原始符号显示注音，请关闭此选项",
 	settings_ruby_size_name						: "注音大小",

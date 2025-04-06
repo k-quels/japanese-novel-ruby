@@ -12,6 +12,16 @@ export default {
 
 	settings_command_title: "コマンド",
 	settings_support_title: "サポート",
+	
+	settings_start_character_ruby_name: "ルビの開始文字",
+	settings_start_character_ruby_desc: "《 に置き換える文字",
+	settings_end_character_ruby_name: "ルビの終了文字",
+	settings_end_character_ruby_desc: "》 に置き換える文字",
+	settings_hide_ruby_unless_hover_name: "ホバー時以外はルビを非表示",
+	settings_hide_ruby_unless_hover_desc: "ホバーしていない場合、ルビの上部テキストを非表示にします",
+	
+	settings_enable_pernote_name: "特定のノートでルビを有効化",
+	settings_enable_pernote_desc: "特定のノートでのみルビを有効化したい場合（ノートのプロパティで enable_ruby: true を設定）",
 
 	settings_source_mode_render_name			: "ソースモードでルビを表示",
 	settings_source_mode_render_desc			: "ソースモードではルビ記号を入力したままの文字として表示したい場合、オフにしてください",

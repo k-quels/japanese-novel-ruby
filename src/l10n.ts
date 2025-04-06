@@ -6,7 +6,8 @@ import zh from "../locale/zh";
 const localeMap = {
 	en,
 	ja,
-	zh,
+	"zh-cn": zh,
+	zh: zh,
 }
 
 const locale = localeMap[moment.locale() as keyof typeof localeMap];

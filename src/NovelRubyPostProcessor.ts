@@ -2,6 +2,22 @@ import { MarkdownPostProcessorContext } from "obsidian";
 
 import {NovelRubyPluginSettings, RubyRegex} from "./main";
 
+function shouldEnableForNote(settings : NovelRubyPluginSettings): boolean {
+	if (!settings.enablePerNote) {
+		return true; // 全局启用
+	}
+	const activeFile = this.app.workspace.getActiveFile();
+	if (!activeFile) {
+		return false; // 如果没有活动文件，则功能不生效
+	}
+	const frontmatter = this.app.metadataCache.getFileCache(activeFile)?.frontmatter;
+	if (frontmatter && frontmatter["enable_ruby"] !== undefined) {
+		return frontmatter["enable_ruby"] === true; // 根据 frontmatter 判断
+	}
+	return false;
+}
+
+
 /**
 	Convert ruby marks to tag for MarkdownPostProcessor
 */
