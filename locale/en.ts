@@ -19,6 +19,7 @@ export default {
 	settings_end_character_ruby_desc: "The character to replace 》",
 	settings_hide_ruby_unless_hover_name: "Hide ruby unless hover",
 	settings_hide_ruby_unless_hover_desc: "Hides the ruby upper text unless hovered",
+	
 	settings_source_mode_render_name			: "Enable ruby preview in source mode",
 	settings_source_mode_render_desc			: "Turn off if you want to display ruby marks as is in source mode.",
 	settings_ruby_size_name						: "Ruby size",
@@ -30,5 +31,4 @@ export default {
 	settings_donate_name: "Donate",
 	settings_donate_desc	: "If you like this plugin, I would be grateful if you would consider making a donation to support development.",
 	settings_donate_button	: "Buy me a rice ball",
-
 }

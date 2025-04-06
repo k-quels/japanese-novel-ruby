@@ -1,10 +1,12 @@
 import { moment } from "obsidian";
 import en from "../locale/en";
 import ja from "../locale/ja";
+import zh from "../locale/zh";
 
 const localeMap = {
 	en,
 	ja,
+	zh,
 }
 
 const locale = localeMap[moment.locale() as keyof typeof localeMap];
