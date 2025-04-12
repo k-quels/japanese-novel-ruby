@@ -13,6 +13,8 @@ export default {
 	settings_command_title: "命令",
 	settings_support_title: "支持",
 
+	settings_modify_character_ruby_name: "自定义注音符号",
+	settings_modify_character_ruby_desc: "是否允许修改注音符号（例如将《》改为【】符号） ⚠️ 请确保你知道自己在做什么，更换符号可能会导致现有的日式小说注音功能受到影响",
 	settings_start_character_ruby_name: "注音起始符号",
 	settings_start_character_ruby_desc: "用来替换默认的 《 符号",
 	settings_end_character_ruby_name: "注音结束符号",
@@ -21,7 +23,7 @@ export default {
 	settings_hide_ruby_unless_hover_desc: "悬停时显示注音，其他时间隐藏注音",
 	
 	settings_enable_pernote_name: "只为特定笔记启用注音",
-	settings_enable_pernote_desc: "仅在特定笔记（笔记属性中配置 enable_ruby: true）启用注音",
+	settings_enable_pernote_desc: "仅在特定笔记内启用注音转换（笔记属性中配置 enable_ruby: true）",
 
 	settings_source_mode_render_name			: "在源码模式下显示注音",
 	settings_source_mode_render_desc			: "如果希望在源码模式下以原始符号显示注音，请关闭此选项",

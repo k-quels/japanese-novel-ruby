@@ -49,28 +49,54 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl).setName(t("settings_command_title")).setHeading();
+
+		
 		new Setting(containerEl)
-			.setName(t("settings_start_character_ruby_name"))
-			.setDesc(t("settings_start_character_ruby_desc"))
-			.addText(text => text
-				.setValue(this.plugin.settings.startRubyCharacter)
+			.setName(t("settings_modify_character_ruby_name"))
+			.setDesc(t("settings_modify_character_ruby_desc"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.modifyRubyCharacter)
 				.onChange(async (value) => {
-					this.plugin.settings.startRubyCharacter = value;
+					this.plugin.settings.modifyRubyCharacter = value;
 					await this.plugin.saveSettings();
-					RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+
+					// Switch the ruby regexp when toggled.
+					if (!value) {
+						RubyRegex.resetRubyRegexp();
+					} else {
+						RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+					}
+
+					this.display();
 				})
 			);
-		new Setting(containerEl)
-			.setName(t("settings_end_character_ruby_name"))
-			.setDesc(t("settings_end_character_ruby_desc"))
-			.addText(text => text
-				.setValue(this.plugin.settings.endRubyCharacter)
-				.onChange(async (value) => {
-					this.plugin.settings.endRubyCharacter = value;
-					await this.plugin.saveSettings();
-					RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
-				})
-			);
+
+		if (this.plugin.settings.modifyRubyCharacter) {
+			new Setting(containerEl)
+				.setName(t("settings_start_character_ruby_name"))
+				.setDesc(t("settings_start_character_ruby_desc"))
+				.addText(text => text
+					.setValue(this.plugin.settings.startRubyCharacter)
+					.onChange(async (value) => {
+						this.plugin.settings.startRubyCharacter = value;
+						await this.plugin.saveSettings();
+						RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+					})
+				);
+
+			new Setting(containerEl)
+				.setName(t("settings_end_character_ruby_name"))
+				.setDesc(t("settings_end_character_ruby_desc"))
+				.addText(text => text
+					.setValue(this.plugin.settings.endRubyCharacter)
+					.onChange(async (value) => {
+						this.plugin.settings.endRubyCharacter = value;
+						await this.plugin.saveSettings();
+						RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+					})
+				);
+		}
+
 		new Setting(containerEl)
 			.setName(t("settings_hide_ruby_unless_hover_name"))
 			.setDesc(t("settings_hide_ruby_unless_hover_name"))

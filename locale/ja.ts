@@ -13,6 +13,8 @@ export default {
 	settings_command_title: "コマンド",
 	settings_support_title: "サポート",
 	
+	settings_modify_character_ruby_name: "ルビの文字のカスタマイズ",
+	settings_modify_character_ruby_desc: "ルビの文字を変更します（例：《》→〖〗）⚠️ 既存のルビ記法との互換性が失われる可能性があるため、有効化前のバックアップを推奨しま",
 	settings_start_character_ruby_name: "ルビの開始文字",
 	settings_start_character_ruby_desc: "《 に置き換える文字",
 	settings_end_character_ruby_name: "ルビの終了文字",

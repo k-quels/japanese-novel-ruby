@@ -13,6 +13,8 @@ export default {
 	settings_command_title: "Command",
 	settings_support_title: "Support",
 
+	settings_modify_character_ruby_name: "Customize ruby character",
+	settings_modify_character_ruby_desc: "Enable to customize the ruby character (e.g. 《》→ 〖〗 ) ⚠️ don't turn on it unless you know what you're doing, this might break existing novel ruby functionality",
 	settings_start_character_ruby_name: "Start ruby character",
 	settings_start_character_ruby_desc: "The character to replace 《",
 	settings_end_character_ruby_name: "End ruby character",

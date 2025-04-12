@@ -18,11 +18,16 @@ export class RubyRegex {
 	static changeRubyRegexp(start: string, end: string) {
 		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp(start, end);
 	}
+	
+	static resetRubyRegexp() {
+		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》");
+	}
 }
 
 export interface NovelRubyPluginSettings {
 	sourceModeRendering: boolean,
 	insertFullWidthMark: boolean,
+	modifyRubyCharacter: boolean,
 	startRubyCharacter: string,
 	endRubyCharacter: string,
 	hideRuby: boolean,
@@ -34,6 +39,7 @@ export interface NovelRubyPluginSettings {
 const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 	sourceModeRendering: true,
 	insertFullWidthMark: true,
+	modifyRubyCharacter: false,
 	startRubyCharacter: "《",
 	endRubyCharacter: "》",
 	hideRuby: false,
