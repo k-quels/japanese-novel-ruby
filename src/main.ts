@@ -57,7 +57,7 @@ export default class NovelRubyPlugin extends Plugin {
 		}
 
 		this.registerMarkdownPostProcessor((el, ctx) => {
-			novelRubyPostProcessor(el, ctx, this.settings);
+			novelRubyPostProcessor(el, ctx, this.settings); // affect to reading view
 		});
 
 		this.registerEditorExtension(novelRubyExtension(this.app, this)); // affect to editor (source or live-preview)
