@@ -1,21 +1,20 @@
-import {App} from "obsidian";
-import {ViewPlugin, WidgetType, ViewUpdate, Decoration, DecorationSet, EditorView} from '@codemirror/view';
-import {RangeSetBuilder} from "@codemirror/state";
-import {editorLivePreviewField} from 'obsidian';
+import { App } from "obsidian";
+import { ViewPlugin, WidgetType, ViewUpdate, Decoration, DecorationSet, EditorView } from '@codemirror/view';
+import { RangeSetBuilder } from "@codemirror/state";
+import { editorLivePreviewField } from 'obsidian';
 
-import NovelRubyPlugin, {RubyRegex} from "./main";
+import NovelRubyPlugin, { RubyRegex } from "./main";
 
 function shouldEnableForNote(plugin: NovelRubyPlugin, view : EditorView): boolean {
 	const viewVerified = plugin.settings.sourceModeRendering || view.state.field(editorLivePreviewField);
 
 	if (!plugin.settings.enablePerNote) {
-		
 		return viewVerified;
 	}
 
 	const activeFile = this.app.workspace.getActiveFile();
 	if (!activeFile) {
-		return false; // 如果没有活动文件，则功能不生效
+		return false; // does not work if there is no active file / 如果没有活动文件，则功能不生效
 	}
 	const frontmatter = this.app.metadataCache.getFileCache(activeFile)?.frontmatter;
 	if (frontmatter && frontmatter["enable_ruby"] !== undefined) {
@@ -51,26 +50,44 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 		decorations: DecorationSet;
 		sourceModeRendering: boolean; // needs to detect setting change
 		perNoteEnable: boolean; // needs to detect per note setting change
+		modifyRubyCharacter: boolean;
+		startRubyCharacter: string;
+		endRubyCharacter: string;
 
 		constructor(view: EditorView) {
 			this.decorations = this.updateDecorations(view);
 			this.sourceModeRendering = plugin.settings.sourceModeRendering;
 			this.perNoteEnable = plugin.settings.enablePerNote;
+			this.modifyRubyCharacter = plugin.settings.modifyRubyCharacter;
+			this.startRubyCharacter = plugin.settings.startRubyCharacter;
+			this.endRubyCharacter = plugin.settings.endRubyCharacter;
 		}
 
 		update(update: ViewUpdate) {
 			if (update.docChanged || update.viewportChanged || update.selectionSet ||
 				(update.startState.field(editorLivePreviewField) != update.state.field(editorLivePreviewField)) ||
-				(!update.startState.field(editorLivePreviewField) && (this.sourceModeRendering != plugin.settings.sourceModeRendering))) {
+				(!update.startState.field(editorLivePreviewField) && (this.sourceModeRendering != plugin.settings.sourceModeRendering)) ||
+				(this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) ||
+				(this.startRubyCharacter != plugin.settings.startRubyCharacter) ||
+				(this.endRubyCharacter != plugin.settings.endRubyCharacter)) {
+				// apply settings to view plugin (necessary to apply changes as soon as settings are changed)
 				if (this.sourceModeRendering != plugin.settings.sourceModeRendering) {
-					this.sourceModeRendering = plugin.settings.sourceModeRendering; // apply setting to view plugin
+					this.sourceModeRendering = plugin.settings.sourceModeRendering;
+				}
+				if (this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) {
+					this.modifyRubyCharacter = plugin.settings.modifyRubyCharacter;
+				}
+				if (this.startRubyCharacter != plugin.settings.startRubyCharacter) {
+					this.startRubyCharacter = plugin.settings.startRubyCharacter;
+				}
+				if (this.endRubyCharacter != plugin.settings.endRubyCharacter) {
+					this.endRubyCharacter = plugin.settings.endRubyCharacter;
 				}
 				this.decorations = this.updateDecorations(update.view);
 			}
 		}
 
-		destroy() {
-		}
+		destroy() {	}
 
 		/**
 		 * Set up DecorationSet with setting & mode check

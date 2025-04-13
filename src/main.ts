@@ -1,8 +1,7 @@
-import {App, Editor, MarkdownView, Modal, Plugin, Setting, Notice} from 'obsidian';
-
-import {novelRubyPostProcessor} from 'src/NovelRubyPostProcessor';
-import {novelRubyExtension} from 'src/NovelRubyViewPlugin';
-import {NovelRubySettingTab} from './NovelRubySettingTab';
+import { App, Editor, MarkdownView, Modal, Plugin, Setting, Notice } from 'obsidian';
+import { novelRubyPostProcessor } from 'src/NovelRubyPostProcessor';
+import { novelRubyExtension } from 'src/NovelRubyViewPlugin';
+import { NovelRubySettingTab } from './NovelRubySettingTab';
 import t from "./l10n";
 
 // Regular expression for japanese novel ruby
@@ -13,7 +12,7 @@ export class RubyRegex {
 
 	static createRubyRegexp(start: string, end: string) {
 		return new RegExp(`(?:(?:[|｜]?(?<body1>[一-龠]+?))|(?:[|｜](?<body2>[^|｜]+?)))${start}(?<ruby>.+?)${end}`, 'gm');
-	};
+	}
 
 	static changeRubyRegexp(start: string, end: string) {
 		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp(start, end);
@@ -25,27 +24,27 @@ export class RubyRegex {
 }
 
 export interface NovelRubyPluginSettings {
+	rubySize: number,
+	hideRuby: boolean,
 	sourceModeRendering: boolean,
 	insertFullWidthMark: boolean,
+	emphasisDot: string,
+	enablePerNote: boolean,
 	modifyRubyCharacter: boolean,
 	startRubyCharacter: string,
-	endRubyCharacter: string,
-	hideRuby: boolean,
-	emphasisDot: string,
-	rubySize: number,
-	enablePerNote: boolean
+	endRubyCharacter: string
 }
 
 const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
+	rubySize: 0.5,
+	hideRuby: false,
 	sourceModeRendering: true,
 	insertFullWidthMark: true,
+	emphasisDot: '・',
+	enablePerNote: false, // Disable by default
 	modifyRubyCharacter: false,
 	startRubyCharacter: "《",
-	endRubyCharacter: "》",
-	hideRuby: false,
-	emphasisDot: '・',
-	rubySize: 0.5,
-	enablePerNote: false // Disable by default
+	endRubyCharacter: "》"
 }
 
 export default class NovelRubyPlugin extends Plugin {
@@ -53,13 +52,30 @@ export default class NovelRubyPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
-		RubyRegex.changeRubyRegexp(this.settings.startRubyCharacter, this.settings.endRubyCharacter);
+		if (this.settings.modifyRubyCharacter) {
+			RubyRegex.changeRubyRegexp(this.settings.startRubyCharacter, this.settings.endRubyCharacter);
+		}
 
 		this.registerMarkdownPostProcessor((el, ctx) => {
 			novelRubyPostProcessor(el, ctx, this.settings);
 		});
 
 		this.registerEditorExtension(novelRubyExtension(this.app, this)); // affect to editor (source or live-preview)
+
+		// Detect frontmatter change & rerender preview (reading-mode)
+		this.registerEvent(
+			this.app.metadataCache.on("changed", (file, data, cache) => {
+				const frontmatter = cache?.frontmatter;
+				if (frontmatter) {
+					if (file === this.app.workspace.getActiveFile()) {
+						const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+						if (view) {
+							view.previewMode.rerender(true);
+						}
+					}
+				}
+			})
+		);
 
 		// Display ruby insert modal
 		this.addCommand({
@@ -69,7 +85,13 @@ export default class NovelRubyPlugin extends Plugin {
 				const body = removeRuby(editor.getSelection());
 				new RubyInsertModal(this.app, body, (insertBody, insertRuby) => {
 					const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
-					editor.replaceSelection(separateMark + insertBody + "《" + insertRuby + "》");
+					let start = "《";
+					let end = "》";
+					if (this.settings.modifyRubyCharacter) {
+						start = this.settings.startRubyCharacter;
+						end = this.settings.endRubyCharacter;
+					}
+					editor.replaceSelection(separateMark + insertBody + start + insertRuby + end);
 				}).open();
 			}
 		});
@@ -84,10 +106,16 @@ export default class NovelRubyPlugin extends Plugin {
 				} else {
 					// Insert emphasis dot per character
 					let withDots = '';
-					const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
+					const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";					
+					let start = "《";
+					let end = "》";
+					if (this.settings.modifyRubyCharacter) {
+						start = this.settings.startRubyCharacter;
+						end = this.settings.endRubyCharacter;
+					}
 					sel = removeRuby(sel);
 					for (let c = 0; c < sel.length; c++) {
-						withDots += separateMark + sel[c] + '《' + this.settings.emphasisDot[0] + '》';
+						withDots += separateMark + sel[c] + start + this.settings.emphasisDot[0] + end;
 					}
 					editor.replaceSelection(withDots);
 				}
@@ -120,6 +148,11 @@ export default class NovelRubyPlugin extends Plugin {
 		updateRubySize(this.settings.rubySize);
 		// Flush the changes to all editors
 		this.app.workspace.updateOptions();
+		// Rerender preview (reading-mode)
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (view) {
+			view.previewMode.rerender(true);
+		}
 	}
 }
 
@@ -153,9 +186,9 @@ export class RubyInsertModal extends Modal {
 	}
 
 	onOpen() {
-		const {contentEl} = this;
+		const { contentEl } = this;
 
-		contentEl.createEl("h1", {text: t("ruby_insert_modal_title")});
+		contentEl.createEl("h1", { text: t("ruby_insert_modal_title") });
 
 		new Setting(contentEl)
 			.setName(t("ruby_insert_modal_body"))
@@ -184,7 +217,7 @@ export class RubyInsertModal extends Modal {
 	}
 
 	onClose() {
-		const {contentEl} = this;
+		const { contentEl } = this;
 		contentEl.empty();
 	}
 }

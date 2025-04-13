@@ -4,9 +4,9 @@ ruby > rt {
 }
 
 ruby.ruby-hide rt {
-	display: none;
+	opacity: 0%;
 }
 
 ruby.ruby-hide:hover rt {
-	display: ruby-text;
+	opacity: 100%;
 }

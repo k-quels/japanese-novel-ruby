@@ -1,27 +1,26 @@
 import { MarkdownPostProcessorContext } from "obsidian";
 
-import {NovelRubyPluginSettings, RubyRegex} from "./main";
+import { NovelRubyPluginSettings, RubyRegex } from "./main";
 
 function shouldEnableForNote(settings : NovelRubyPluginSettings): boolean {
 	if (!settings.enablePerNote) {
-		return true; // 全局启用
+		return true; // enable ruby in all notes / 全局启用
 	}
 	const activeFile = this.app.workspace.getActiveFile();
 	if (!activeFile) {
-		return false; // 如果没有活动文件，则功能不生效
+		return false; // does not work if there is no active file / 如果没有活动文件，则功能不生效
 	}
 	const frontmatter = this.app.metadataCache.getFileCache(activeFile)?.frontmatter;
 	if (frontmatter && frontmatter["enable_ruby"] !== undefined) {
-		return frontmatter["enable_ruby"] === true; // 根据 frontmatter 判断
+		return frontmatter["enable_ruby"] === true; // Judging by frontmatter / 根据 frontmatter 判断
 	}
 	return false;
 }
 
-
 /**
 	Convert ruby marks to tag for MarkdownPostProcessor
 */
-export const convertNovelRuby = (element: Text, hide: boolean = false): Node => {
+export const convertNovelRuby = (element: Text, hide = false): Node => {
 	if (element.textContent) {
 		const matches = Array.from(element.textContent.matchAll(RubyRegex.RUBY_REGEXP));
 		let lastNode = element;
@@ -50,9 +49,10 @@ export const convertNovelRuby = (element: Text, hide: boolean = false): Node => 
 /**
  * Ruby convert MarkdownPostProcessor - for reading view
  */
-export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext, settings?: NovelRubyPluginSettings) => {
+export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext, settings: NovelRubyPluginSettings) => {
 	const searchBlock = e.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ol, ul, table');
 	if (searchBlock.length === 0) return;
+	if (!shouldEnableForNote(settings)) return;
 
 	// function for process all nodes recursively
 	function replaceRuby(node: Node) {
@@ -71,6 +71,7 @@ export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcesso
 		});
 	}
 
+	
 	searchBlock.forEach(block => {
 		replaceRuby(block);
 	})
