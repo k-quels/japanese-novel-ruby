@@ -1,19 +1,37 @@
-import { MarkdownPostProcessor, MarkdownPostProcessorContext } from "obsidian";
+import { MarkdownPostProcessorContext } from "obsidian";
 
-import { RUBY_REGEXP } from "./main";
+import { NovelRubyPluginSettings, RubyRegex } from "./main";
+
+function shouldEnableForNote(settings : NovelRubyPluginSettings): boolean {
+	if (!settings.enablePerNote) {
+		return true; // enable ruby in all notes / 全局启用
+	}
+	const activeFile = this.app.workspace.getActiveFile();
+	if (!activeFile) {
+		return false; // does not work if there is no active file / 如果没有活动文件，则功能不生效
+	}
+	const frontmatter = this.app.metadataCache.getFileCache(activeFile)?.frontmatter;
+	if (frontmatter && frontmatter["enable_ruby"] !== undefined) {
+		return frontmatter["enable_ruby"] === true; // Judging by frontmatter / 根据 frontmatter 判断
+	}
+	return false;
+}
 
 /**
 	Convert ruby marks to tag for MarkdownPostProcessor
 */
-export const convertNovelRuby = (element: Text): Node => {
+export const convertNovelRuby = (element: Text, hide = false): Node => {
 	if (element.textContent) {
-		const matches = Array.from(element.textContent.matchAll(RUBY_REGEXP));
+		const matches = Array.from(element.textContent.matchAll(RubyRegex.RUBY_REGEXP));
 		let lastNode = element;
 		for (const match of matches) {
 			const ruby = match.groups!.ruby; // if there is a match, there must be a ruby
 			const body = match.groups?.body1 ? match.groups!.body1 : match.groups!.body2;
 			// Set up ruby tag
 			const rubyNode = document.createElement('ruby');
+			if (hide){
+				rubyNode.addClass('ruby-hide');
+			}
 			rubyNode.addClass('ruby');
 			rubyNode.appendText(body);
 			rubyNode.createEl('rt', { text: ruby });
@@ -31,9 +49,10 @@ export const convertNovelRuby = (element: Text): Node => {
 /**
  * Ruby convert MarkdownPostProcessor - for reading view
  */
-export const novelRubyPostProcessor: MarkdownPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext, settings: NovelRubyPluginSettings) => {
 	const searchBlock = e.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ol, ul, table');
 	if (searchBlock.length === 0) return;
+	if (!shouldEnableForNote(settings)) return;
 
 	// function for process all nodes recursively
 	function replaceRuby(node: Node) {
@@ -48,10 +67,11 @@ export const novelRubyPostProcessor: MarkdownPostProcessor = (e: HTMLElement, ct
 		});
 		// Convert ruby marks to ruby tags
 		children.forEach((child) => {
-			child.replaceWith(convertNovelRuby(child));
+			child.replaceWith(convertNovelRuby(child, settings?.hideRuby));
 		});
 	}
 
+	
 	searchBlock.forEach(block => {
 		replaceRuby(block);
 	})

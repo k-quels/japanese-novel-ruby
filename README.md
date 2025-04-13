@@ -24,7 +24,9 @@ Format example:
 
 - Edit documents while previewing ruby
   - Enable / disable ruby preview in source mode via plugin settings.
-- The user interface is available in English and Japanese.
+  - Ruby can be enabled for specific notes only. (Turn on the option and set the property "enable_ruby: true") (from ver. 1.2.0)
+  - You can change the ruby marks for non-Japanese novel use. e.g. 《》 → 【】 (from ver. 1.2.0)
+- The user interface is available in English / Japanese / Chinese(zh).
 
 
   
@@ -45,6 +47,8 @@ If you want to use it, consider to use [obsidian-markdown-furigana](https://gith
 Thanks to @steven-kraft. Part of the Ruby parsing code was inspired by [obsidian-markdown-furigana](https://github.com/steven-kraft/obsidian-markdown-furigana) plugin.
 
 Thanks to @phibr0. The localization code is based on the [obsidian-commander](https://github.com/phibr0/obsidian-commander) plugin.
+
+Special thanks to @Moyf and @MinZe25 for their PRs and suggestions regarding the new features in ver. 1.2.0 and Chinese(zh) localization support!
 
 ## Support
 
