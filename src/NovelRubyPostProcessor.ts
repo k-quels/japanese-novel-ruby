@@ -46,6 +46,48 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 	}
 	return element;
 }
+
+/**
+	Allow MarkdownPostProcessor to understand shortcut for users
+	to control alignment of ruby and word using separator in
+	a single pair of double brackets. For example,
+
+ 	｜日本語《に｜ほん｜ご》 = ｜日《に》｜本《ほん》｜語《ご》
+ 	｜短い間《みじか｜｜あいだ》 = ｜短《みじか》い｜間《あいだ》
+ */
+export const convertNovelRubyWithSeparators = (element: Text, hide = false, sep = '｜'): Node => {
+	if (element.textContent) {
+		const matches = Array.from(element.textContent.matchAll(RubyRegex.RUBY_REGEXP));
+		let lastNode = element;
+		for (const match of matches) {
+			const rubies = match.groups!.ruby.split(sep); // if there is a match, there must be a ruby
+			const body = (match.groups?.body1 ? match.groups!.body1 : match.groups!.body2);
+			// Set up ruby tag
+			const rubyNode = document.createElement('ruby');
+			if (hide) {
+				rubyNode.addClass('ruby-hide');
+			}
+			rubyNode.addClass('ruby');
+
+			for (let i = 0; i < body.length; i++) {
+				rubyNode.appendText(body[i]);
+				if (i > rubies.length) {
+					continue
+				}
+				rubyNode.createEl('rt', {text: rubies[i]});
+			}
+			// Replace node
+			if (lastNode.textContent) {
+				const offset = lastNode.textContent.indexOf(match[0]);
+				const nodeToReplace = lastNode.splitText(offset);
+				lastNode = nodeToReplace.splitText(match[0].length);
+				nodeToReplace.replaceWith(rubyNode);
+			}
+		}
+	}
+	return element
+}
+
 /**
  * Ruby convert MarkdownPostProcessor - for reading view
  */
@@ -67,7 +109,7 @@ export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcesso
 		});
 		// Convert ruby marks to ruby tags
 		children.forEach((child) => {
-			child.replaceWith(convertNovelRuby(child, settings?.hideRuby));
+			child.replaceWith(convertNovelRubyWithSeparators(child, settings?.hideRuby));
 		});
 	}
 

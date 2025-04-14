@@ -42,6 +42,28 @@ class NovelRubyWidget extends WidgetType {
 	}
 }
 
+class NovelRubyWithSeparatorsWidget extends WidgetType {
+	constructor(readonly body: string, readonly ruby: string, readonly hide: boolean = false, readonly sep='｜') {
+		super();
+	}
+
+	toDOM(view: EditorView): HTMLElement {
+		const rubyNode = document.createElement('ruby');
+		if (this.hide) {
+			rubyNode.className = "ruby-hide";
+		}
+		const rubies = this.ruby.split(this.sep)
+		for (let i = 0; i < this.body.length; i++) {
+			rubyNode.appendText(this.body[i])
+			if (i > rubies.length) {
+				continue
+			}
+			rubyNode.createEl('rt', {text: rubies[i]});
+		}
+		return rubyNode;
+	}
+}
+
 /**
 	View Plugin wrapper function for access to plugin settings - for editor view
  */
@@ -131,7 +153,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 							}
 						})
 						if (add) {
-							builder.add(from, to, Decoration.widget({widget: new NovelRubyWidget(body, ruby, plugin.settings.hideRuby)}))
+							builder.add(from, to, Decoration.widget({widget: new NovelRubyWithSeparatorsWidget(body, ruby, plugin.settings.hideRuby)}))
 						}
 					}
 					pos = line.to + 1;
