@@ -1,13 +1,15 @@
 import { moment } from "obsidian";
 import en from "../locale/en";
 import ja from "../locale/ja";
-import zh from "../locale/zh";
+import chs from "../locale/zh"; // Chinese (Simplified)
+import cht from "../locale/zh-tw"; // Chinese (Traditional)
 
 const localeMap = {
 	en,
 	ja,
-	"zh-cn": zh,
-	zh: zh,
+	zh: chs,
+	"zh-cn": chs,
+	"zh-tw": cht,
 }
 
 const locale = localeMap[moment.locale() as keyof typeof localeMap];
