@@ -11,7 +11,7 @@ export class RubyRegex {
 	static RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》");
 
 	static createRubyRegexp(start: string, end: string) {
-		return new RegExp(`(?:(?:[|｜]?(?<body1>[一-龠]+?))|(?:[|｜](?<body2>[^|｜]+?)))${start}(?<ruby>.+?)${end}`, 'gm');
+		return new RegExp(`(?:(?:[|｜]?(?<body1>[一-龠々]+?))|(?:[|｜](?<body2>[^|｜]+?)))${start}(?<ruby>.+?)${end}`, 'gm');
 	}
 
 	static changeRubyRegexp(start: string, end: string) {
