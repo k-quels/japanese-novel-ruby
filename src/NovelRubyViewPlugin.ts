@@ -107,6 +107,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 			const builder = new RangeSetBuilder<Decoration>();
 			const selections = [...view.state.selection.ranges];
 
+			let lastLine = -1;
 			for (const viewRange of view.visibleRanges) {
 				// if whole viewport is selected, skip decorate
 				selections.forEach((r) => {
@@ -117,6 +118,12 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 				// search ruby & decorate
 				for (let pos = viewRange.from; pos <= viewRange.to;) {
 					const line = view.state.doc.lineAt(pos);
+					if (line.number == lastLine) {
+                    	// this line has already been processed, skip to the next position
+                		pos = line.to + 1;
+        	            continue;
+    	            }
+	                lastLine = line.number;
 					const matches = Array.from(line.text.matchAll(RubyRegex.RUBY_REGEXP));
 					for (const match of matches) {
 						let add = true;
