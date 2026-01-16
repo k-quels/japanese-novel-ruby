@@ -95,6 +95,31 @@ export default class NovelRubyPlugin extends Plugin {
 				}).open();
 			}
 		});
+		// Insert ruby directly
+		this.addCommand({
+			id: 'novel-ruby-insert-direct',
+			name: t("command_insert_novel_ruby_direct"),
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const selection = editor.getSelection();
+				const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
+				let start = "《";
+				let end = "》";
+				if (this.settings.modifyRubyCharacter) {
+					start = this.settings.startRubyCharacter;
+					end = this.settings.endRubyCharacter;
+				}
+
+				const textToInsert = separateMark + selection + start + end;
+				editor.replaceSelection(textToInsert);
+
+				// Move cursor back inside the brackets
+				const cursor = editor.getCursor();
+				editor.setCursor({
+					line: cursor.line,
+					ch: cursor.ch - end.length
+				});
+			}
+		});
 		// Insert emphasis dot to selection
 		this.addCommand({
 			id: 'novel-ruby-insert-dot',

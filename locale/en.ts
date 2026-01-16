@@ -1,5 +1,6 @@
 export default {
 	command_insert_novel_ruby: "Insert novel ruby",
+	command_insert_novel_ruby_direct: "Insert novel ruby (Direct)",
 	command_insert_novel_dot: "Insert novel emphasis dot",
 	command_remove_novel_ruby: "Remove novel ruby from selection",
 

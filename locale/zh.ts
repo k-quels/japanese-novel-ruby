@@ -1,5 +1,6 @@
 export default {
 	command_insert_novel_ruby: "插入注音",
+	command_insert_novel_ruby_direct : "直接插入注音符号",
 	command_insert_novel_dot : "插入着重号",
 	command_remove_novel_ruby: "从选区删除注音",
 

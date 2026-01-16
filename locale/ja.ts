@@ -1,5 +1,6 @@
 export default {
 	command_insert_novel_ruby: "ルビを挿入",
+	command_insert_novel_ruby_direct : "ルビ記号を直接挿入",
 	command_insert_novel_dot : "傍点を挿入",
 	command_remove_novel_ruby: "選択範囲からルビを削除",
 
