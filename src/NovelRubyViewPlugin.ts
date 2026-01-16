@@ -1,45 +1,26 @@
 import { App } from "obsidian";
-import { ViewPlugin, WidgetType, ViewUpdate, Decoration, DecorationSet, EditorView } from '@codemirror/view';
+import { ViewPlugin, ViewUpdate, Decoration, DecorationSet, EditorView } from '@codemirror/view';
 import { RangeSetBuilder } from "@codemirror/state";
 import { editorLivePreviewField } from 'obsidian';
 
 import NovelRubyPlugin, { RubyRegex } from "./main";
 
-function shouldEnableForNote(plugin: NovelRubyPlugin, view : EditorView): boolean {
+function shouldEnableForNote(plugin: NovelRubyPlugin, view: EditorView, app: App): boolean {
 	const viewVerified = plugin.settings.sourceModeRendering || view.state.field(editorLivePreviewField);
 
 	if (!plugin.settings.enablePerNote) {
 		return viewVerified;
 	}
 
-	const activeFile = this.app.workspace.getActiveFile();
+	const activeFile = app.workspace.getActiveFile();
 	if (!activeFile) {
 		return false; // does not work if there is no active file / 如果没有活动文件，则功能不生效
 	}
-	const frontmatter = this.app.metadataCache.getFileCache(activeFile)?.frontmatter;
+	const frontmatter = app.metadataCache.getFileCache(activeFile)?.frontmatter;
 	if (frontmatter && frontmatter["enable_ruby"] !== undefined) {
 		return frontmatter["enable_ruby"] === true && viewVerified;
 	}
 	return false;
-}
-
-/**
-	Tag insert widget for View Plugin
- */
-class NovelRubyWidget extends WidgetType {
-	constructor(readonly body: string, readonly ruby: string, readonly hide: boolean = false) {
-		super();
-	}
-
-	toDOM(view: EditorView): HTMLElement {
-		const ruby = document.createElement('ruby');
-		if (this.hide) {
-			ruby.className = "ruby-hide";
-		}
-		ruby.appendText(this.body);
-		ruby.createEl('rt', {text: this.ruby});
-		return ruby;
-	}
 }
 
 /**
@@ -87,13 +68,14 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 			}
 		}
 
-		destroy() {	}
+		destroy() { }
 
 		/**
 		 * Set up DecorationSet with setting & mode check
 		 */
 		private updateDecorations(view: EditorView): DecorationSet {
-			if (shouldEnableForNote(plugin, view)) {
+			// Pass app explicitly to fix scoping issue
+			if (shouldEnableForNote(plugin, view, app)) {
 				return this.buildDecorations(view);
 			} else {
 				return Decoration.none;
@@ -105,40 +87,79 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 		 */
 		buildDecorations(view: EditorView): DecorationSet {
 			const builder = new RangeSetBuilder<Decoration>();
-			const selections = [...view.state.selection.ranges];
+			const selections = view.state.selection.ranges;
+			let lastLine = -1;
 
-			let lastLine = -1; // to avoid processing the same line multiple times in one update
-			for (const viewRange of view.visibleRanges) {
-				// if whole viewport is selected, skip decorate
-				selections.forEach((r) => {
-					if (r.to >= viewRange.from && r.from <= viewRange.to) {
-						return;
-					}
-				});
-				// search ruby & decorate
-				for (let pos = viewRange.from; pos <= viewRange.to;) {
+			for (const visibleRange of view.visibleRanges) {
+				for (let pos = visibleRange.from; pos <= visibleRange.to;) {
 					const line = view.state.doc.lineAt(pos);
-					if (line.number == lastLine) {
+					if (line.number === lastLine) {
 						// this line has already been processed, skip to the next position
 						pos = line.to + 1;
 						continue;
 					}
 					lastLine = line.number;
-					const matches = Array.from(line.text.matchAll(RubyRegex.RUBY_REGEXP));
+
+					const text = line.text;
+					const matches = Array.from(text.matchAll(RubyRegex.RUBY_REGEXP));
+
 					for (const match of matches) {
-						let add = true;
-						const ruby = match.groups!.ruby; // if there is a match, there will be ruby
-						const body = match.groups?.body1 ? match.groups!.body1 : match.groups!.body2;
-						const from = match.index != undefined ? match.index + line.from : -1
-						const to = from + match[0].length;
+						if (match.index === undefined) continue;
+
+						const matchStart = line.from + match.index;
+						const matchEnd = matchStart + match[0].length;
+
 						// exclude selection
-						selections.forEach((r) => {
-							if (r.to >= from && r.from <= to) {
-								add = false;
+						let inSelection = false;
+						for (const r of selections) {
+							if (r.to >= matchStart && r.from <= matchEnd) {
+								inSelection = true;
+								break;
 							}
-						})
-						if (add) {
-							builder.add(from, to, Decoration.widget({widget: new NovelRubyWidget(body, ruby, plugin.settings.hideRuby)}))
+						}
+						if (inSelection) continue;
+
+						const body = match.groups?.body1 || match.groups?.body2;
+						const rubyText = match.groups?.ruby;
+
+						if (!body || !rubyText) continue;
+
+						const fullMatchText = match[0];
+						const bodyIndex = fullMatchText.indexOf(body);
+						const startDelim = plugin.settings.modifyRubyCharacter ? plugin.settings.startRubyCharacter : "《";
+
+						const prefixLength = bodyIndex;
+
+						// 1. Prefix (separator like |)
+						if (prefixLength > 0) {
+							builder.add(matchStart, matchStart + prefixLength, Decoration.replace({}));
+						}
+
+						// 2. Wrap everything in <ruby>
+						builder.add(matchStart + prefixLength, matchEnd, Decoration.mark({ tagName: "ruby", class: "novel-ruby" }));
+
+						// 3. Start Delimiter (e.g. 《) - Hide it by replacing with empty widget
+						const bodyEndRel = bodyIndex + body.length;
+						const startDelimStart = matchStart + bodyEndRel;
+						const startDelimEnd = startDelimStart + startDelim.length;
+
+						// Check if delim exists in text (it should)
+						if (startDelimStart < startDelimEnd) {
+							builder.add(startDelimStart, startDelimEnd, Decoration.replace({}));
+						}
+
+						// 4. Ruby Text -> <rt>
+						const rubyStart = startDelimEnd;
+						const rubyEnd = rubyStart + rubyText.length;
+						if (rubyEnd > rubyStart) {
+							builder.add(rubyStart, rubyEnd, Decoration.mark({ tagName: "rt" }));
+						}
+
+						// 5. End Delimiter (e.g. 》) - Hide it by replacing with empty widget
+						const endDelimStart = rubyEnd;
+						const endDelimEnd = matchStart + match[0].length;
+						if (endDelimEnd > endDelimStart) {
+							builder.add(endDelimStart, endDelimEnd, Decoration.replace({}));
 						}
 					}
 					pos = line.to + 1;

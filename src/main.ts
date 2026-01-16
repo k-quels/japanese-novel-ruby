@@ -17,7 +17,7 @@ export class RubyRegex {
 	static changeRubyRegexp(start: string, end: string) {
 		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp(start, end);
 	}
-	
+
 	static resetRubyRegexp() {
 		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》");
 	}
@@ -106,7 +106,7 @@ export default class NovelRubyPlugin extends Plugin {
 				} else {
 					// Insert emphasis dot per character
 					let withDots = '';
-					const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";					
+					const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
 					let start = "《";
 					let end = "》";
 					if (this.settings.modifyRubyCharacter) {
@@ -165,7 +165,7 @@ function removeRuby(inputText: string): string {
 	let outputText: string = inputText;
 	const matches = Array.from(inputText.matchAll(RubyRegex.RUBY_REGEXP));
 	for (const match of matches) {
-		const body = match.groups?.body1 ? match.groups!.body1 : match.groups!.body2;
+		const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
 		outputText = outputText.replace(match[0], body);
 	}
 	return outputText;

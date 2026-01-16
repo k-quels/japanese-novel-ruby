@@ -2,7 +2,7 @@ import { MarkdownPostProcessorContext } from "obsidian";
 
 import { NovelRubyPluginSettings, RubyRegex } from "./main";
 
-function shouldEnableForNote(settings : NovelRubyPluginSettings): boolean {
+function shouldEnableForNote(settings: NovelRubyPluginSettings): boolean {
 	if (!settings.enablePerNote) {
 		return true; // enable ruby in all notes / 全局启用
 	}
@@ -25,11 +25,11 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 		const matches = Array.from(element.textContent.matchAll(RubyRegex.RUBY_REGEXP));
 		let lastNode = element;
 		for (const match of matches) {
-			const ruby = match.groups!.ruby; // if there is a match, there must be a ruby
-			const body = match.groups?.body1 ? match.groups!.body1 : match.groups!.body2;
+			const ruby = match.groups?.ruby ?? ""; // if there is a match, there must be a ruby
+			const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
 			// Set up ruby tag
 			const rubyNode = document.createElement('ruby');
-			if (hide){
+			if (hide) {
 				rubyNode.addClass('ruby-hide');
 			}
 			rubyNode.addClass('ruby');
@@ -71,7 +71,7 @@ export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcesso
 		});
 	}
 
-	
+
 	searchBlock.forEach(block => {
 		replaceRuby(block);
 	})
