@@ -28,9 +28,9 @@
 * コマンド：
     * **novel-ruby-insert** : ルビ挿入ダイアログを表示します。選択中のテキストがある場合、本文としてセットされます。
     * **novel-ruby-insert-direct** : ダイアログを開かず、直接エディタ上にルビ記号を挿入します。選択中のテキストが本文になります。
-    * **novel-ruby-toggle-ruby-hidden** : 「ホバー時以外はルビ非表示」設定を切り替えます。
     * **novel-ruby-insert-dot** : 選択テキストに傍点を振ります。傍点の文字は設定で変更できます。
     * **novel-ruby-remove** : 選択範囲のテキストからすべてのルビ記号を削除します。
+    * **novel-ruby-toggle-ruby-hidden** : 「ホバー時以外はルビ非表示」設定のON/OFFを切り替えます。
 
 ## See Also
 
