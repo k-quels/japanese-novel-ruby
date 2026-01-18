@@ -1,6 +1,7 @@
 export default {
 	command_insert_novel_ruby: "插入注音",
 	command_insert_novel_ruby_direct : "直接插入注音符號",
+	command_toggle_ruby_hidden : "切換「只在懸停時顯示注音」設定",
 	command_insert_novel_dot : "插入著重號",
 	command_remove_novel_ruby: "刪除已選取文字的注音",
 
@@ -8,6 +9,9 @@ export default {
 	ruby_insert_modal_body	: "正文",
 	ruby_insert_modal_ruby	: "注音",
 	ruby_insert_modal_ok	: "確定",
+
+	state_on				: "已開啟",
+	state_off				: "已關閉",
 
 	notice_insert_novel_dot_no_selection: "請先選擇需要添加著重號的正文",
 

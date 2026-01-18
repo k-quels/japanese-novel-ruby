@@ -1,6 +1,7 @@
 export default {
 	command_insert_novel_ruby: "Insert novel ruby",
 	command_insert_novel_ruby_direct: "Insert novel ruby (Direct)",
+	command_toggle_ruby_hidden: "Toggle 'Hide ruby unless hover'",
 	command_insert_novel_dot: "Insert novel emphasis dot",
 	command_remove_novel_ruby: "Remove novel ruby from selection",
 
@@ -8,6 +9,9 @@ export default {
 	ruby_insert_modal_body	: "Body",
 	ruby_insert_modal_ruby	: "Ruby",
 	ruby_insert_modal_ok	: "OK",
+
+	state_on				: "ON",
+	state_off				: "OFF",
 
 	notice_insert_novel_dot_no_selection: "Selection is required to insert dots",
 

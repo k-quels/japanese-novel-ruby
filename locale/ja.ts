@@ -1,6 +1,7 @@
 export default {
 	command_insert_novel_ruby: "ルビを挿入",
 	command_insert_novel_ruby_direct : "ルビ記号を直接挿入",
+	command_toggle_ruby_hidden : "「ホバー時以外はルビ非表示」設定をトグル",
 	command_insert_novel_dot : "傍点を挿入",
 	command_remove_novel_ruby: "選択範囲からルビを削除",
 
@@ -9,6 +10,9 @@ export default {
 	ruby_insert_modal_ruby	: "ルビ",
 	ruby_insert_modal_ok	: "OK",
 
+	state_on				: "ON",
+	state_off				: "OFF",
+
 	notice_insert_novel_dot_no_selection: "先に傍点を振りたい本文を選択してください",
 
 	settings_display_title: "表示",	
@@ -16,7 +20,7 @@ export default {
 	settings_ruby_size_desc						: "本文に対するルビの大きさを比率で指定します (デフォルト: 0.5)",
 	settings_source_mode_render_name			: "ソースモードでルビを表示",
 	settings_source_mode_render_desc			: "ソースモードではルビ記号を入力したままの文字として表示したい場合、オフにしてください",
-	settings_hide_ruby_unless_hover_name		: "ホバー時以外はルビを非表示",
+	settings_hide_ruby_unless_hover_name		: "ホバー時以外はルビ非表示",
 	settings_hide_ruby_unless_hover_desc		: "マウスカーソルを乗せている時だけルビを表示します",
 	
 	settings_command_title: "コマンド",

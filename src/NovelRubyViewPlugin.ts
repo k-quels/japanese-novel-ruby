@@ -30,6 +30,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 	return ViewPlugin.fromClass(class {
 		decorations: DecorationSet;
 		sourceModeRendering: boolean; // needs to detect setting change
+		hideRuby: boolean;
 		perNoteEnable: boolean; // needs to detect per note setting change
 		modifyRubyCharacter: boolean;
 		startRubyCharacter: string;
@@ -38,6 +39,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 		constructor(view: EditorView) {
 			this.decorations = this.updateDecorations(view);
 			this.sourceModeRendering = plugin.settings.sourceModeRendering;
+			this.hideRuby = plugin.settings.hideRuby;
 			this.perNoteEnable = plugin.settings.enablePerNote;
 			this.modifyRubyCharacter = plugin.settings.modifyRubyCharacter;
 			this.startRubyCharacter = plugin.settings.startRubyCharacter;
@@ -48,12 +50,16 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 			if (update.docChanged || update.viewportChanged || update.selectionSet ||
 				(update.startState.field(editorLivePreviewField) != update.state.field(editorLivePreviewField)) ||
 				(!update.startState.field(editorLivePreviewField) && (this.sourceModeRendering != plugin.settings.sourceModeRendering)) ||
+				(this.hideRuby != plugin.settings.hideRuby) ||
 				(this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) ||
 				(this.startRubyCharacter != plugin.settings.startRubyCharacter) ||
 				(this.endRubyCharacter != plugin.settings.endRubyCharacter)) {
 				// apply settings to view plugin (necessary to apply changes as soon as settings are changed)
 				if (this.sourceModeRendering != plugin.settings.sourceModeRendering) {
 					this.sourceModeRendering = plugin.settings.sourceModeRendering;
+				}
+				if (this.hideRuby != plugin.settings.hideRuby) {
+					this.hideRuby = plugin.settings.hideRuby;
 				}
 				if (this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) {
 					this.modifyRubyCharacter = plugin.settings.modifyRubyCharacter;
@@ -136,7 +142,8 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 						}
 
 						// 2. Wrap everything in <ruby>
-						builder.add(matchStart + prefixLength, matchEnd, Decoration.mark({ tagName: "ruby", class: "novel-ruby" }));
+						const rubyClass = "novel-ruby" + (this.hideRuby ? " ruby-hide" : "");
+						builder.add(matchStart + prefixLength, matchEnd, Decoration.mark({ tagName: "ruby", class: rubyClass }));
 
 						// 3. Start Delimiter (e.g. 《) - Hide it by replacing with empty widget
 						const bodyEndRel = bodyIndex + body.length;

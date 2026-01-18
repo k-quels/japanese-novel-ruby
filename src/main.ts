@@ -155,6 +155,21 @@ export default class NovelRubyPlugin extends Plugin {
 			}
 		});
 
+		// Toggle hide ruby unless hover
+		this.addCommand({
+			id: 'novel-ruby-toggle-ruby-hidden',
+			name: t("command_toggle_ruby_hidden"),
+			callback: async () => {
+				this.settings.hideRuby = !this.settings.hideRuby;
+				await this.saveSettings();
+				new Notice(
+					this.settings.hideRuby 
+						? t("settings_hide_ruby_unless_hover_name") + ": " + t("state_on")
+						: t("settings_hide_ruby_unless_hover_name") + ": " + t("state_off")
+				);
+			}
+		});
+
 		// Adds a settings tab
 		this.addSettingTab(new NovelRubySettingTab(this.app, this));
 

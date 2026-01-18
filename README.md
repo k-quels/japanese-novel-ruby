@@ -33,6 +33,7 @@ Format example:
 * Commands:
     * **novel-ruby-insert** : Show a dialog to insert ruby. Set selected text as body.
     * **novel-ruby-insert-direct** : Insert ruby marks directly in the editor without opening a dialog.
+    * **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
     * **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
     * **novel-ruby-remove** : Remove all ruby marks from selected text.
 
