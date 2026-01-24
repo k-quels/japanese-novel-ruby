@@ -26,11 +26,11 @@
 - 設定画面などは英語 / 日本語 / 中国語(簡体字/繁体字)に対応しています。
 
 * コマンド：
-    * **novel-ruby-insert** : ルビ挿入ダイアログを表示します。選択中のテキストがある場合、本文としてセットされます。
-    * **novel-ruby-insert-direct** : ダイアログを開かず、直接エディタ上にルビ記号を挿入します。選択中のテキストが本文になります。
-    * **novel-ruby-insert-dot** : 選択テキストに傍点を振ります。傍点の文字は設定で変更できます。
-    * **novel-ruby-remove** : 選択範囲のテキストからすべてのルビ記号を削除します。
-    * **novel-ruby-toggle-ruby-hidden** : 「ホバー時以外はルビ非表示」設定のON/OFFを切り替えます。
+    * <img alt="novel-ruby-insert icon" src="https://github.com/user-attachments/assets/b55ebe72-e76a-4945-99aa-3ba046d80d7a" width="18px"> **novel-ruby-insert** : ルビ挿入ダイアログを表示します。選択中のテキストがある場合、本文としてセットされます。
+    * <img alt="novel-ruby-insert-dot icon" src="https://github.com/user-attachments/assets/b077b267-b96a-4c43-bd73-41e327c7b4da" width="18px"> **novel-ruby-insert-direct** : ダイアログを開かず、直接エディタ上にルビ記号を挿入します。選択中のテキストが本文になります。
+    * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/fd67cc95-3176-4b88-a88b-2639b0b639bd" width="18px"> **novel-ruby-insert-dot** : 選択テキストに傍点を振ります。傍点の文字は設定で変更できます。
+    * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/73d05435-808a-4739-b1c1-310f4a89a287" width="18px"> **novel-ruby-remove** : 選択範囲のテキストからすべてのルビ記号を削除します。
+    * <img alt="novel-ruby-toggle-ruby-hidden icon" src="https://github.com/user-attachments/assets/ff0e0bf6-2056-4f0d-8cc2-2c8c0e2c8b9d" width="18px"> **novel-ruby-toggle-ruby-hidden** : 「ホバー時以外はルビ非表示」設定のON/OFFを切り替えます。
 
 ## See Also
 
