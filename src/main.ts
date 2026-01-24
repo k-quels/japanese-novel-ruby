@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Plugin, Setting, Notice } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Plugin, Setting, Notice, addIcon } from 'obsidian';
 import { novelRubyPostProcessor } from 'src/NovelRubyPostProcessor';
 import { novelRubyExtension } from 'src/NovelRubyViewPlugin';
 import { NovelRubySettingTab } from './NovelRubySettingTab';
@@ -47,11 +47,25 @@ const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 	endRubyCharacter: "》"
 }
 
+const ICON_DATA = {
+    'novel-ruby-insert': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="21" height="21" rx="2" /><path d="M7.5 19.5l4.5-9 4.5 9M9 17h6" /><circle cx="8.5" cy="6.5" r="1.7" /><circle cx="15.5" cy="6.5" r="1.7" /></svg>`,
+    'novel-ruby-insert-direct': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><circle cx="8.5" cy="5" r="1.7" /><circle cx="15.5" cy="5" r="1.7" /></svg>`,
+    'novel-ruby-insert-dot': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><circle cx="12" cy="4.5" r="0.8" fill="currentColor" /></svg>`,
+    'novel-ruby-remove': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><rect x="6" y="3" width="12" height="4" rx="1" stroke-dasharray="1 2.5" /></svg>`,
+    'novel-ruby-toggle-ruby-hidden': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><path d="M7 5h3" /><path d="M14 5h3" /></svg>`
+};
+
 export default class NovelRubyPlugin extends Plugin {
 	settings: NovelRubyPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
+
+		// Register custom icons
+		for (const [id, svg] of Object.entries(ICON_DATA)) {
+			addIcon(id, svg);
+		}
+
 		if (this.settings.modifyRubyCharacter) {
 			RubyRegex.changeRubyRegexp(this.settings.startRubyCharacter, this.settings.endRubyCharacter);
 		}
@@ -81,6 +95,7 @@ export default class NovelRubyPlugin extends Plugin {
 		this.addCommand({
 			id: 'novel-ruby-insert',
 			name: t("command_insert_novel_ruby"),
+			icon: 'novel-ruby-insert',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const body = removeRuby(editor.getSelection());
 				new RubyInsertModal(this.app, body, (insertBody, insertRuby) => {
@@ -99,6 +114,7 @@ export default class NovelRubyPlugin extends Plugin {
 		this.addCommand({
 			id: 'novel-ruby-insert-direct',
 			name: t("command_insert_novel_ruby_direct"),
+			icon: 'novel-ruby-insert-direct',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const selection = editor.getSelection();
 				const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
@@ -124,6 +140,7 @@ export default class NovelRubyPlugin extends Plugin {
 		this.addCommand({
 			id: 'novel-ruby-insert-dot',
 			name: t("command_insert_novel_dot"),
+			icon: 'novel-ruby-insert-dot',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let sel: string = editor.getSelection();
 				if (sel == '') {
@@ -150,6 +167,7 @@ export default class NovelRubyPlugin extends Plugin {
 		this.addCommand({
 			id: 'novel-ruby-remove',
 			name: t("command_remove_novel_ruby"),
+			icon: 'novel-ruby-remove',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				editor.replaceSelection(removeRuby(editor.getSelection()));
 			}
@@ -159,6 +177,7 @@ export default class NovelRubyPlugin extends Plugin {
 		this.addCommand({
 			id: 'novel-ruby-toggle-ruby-hidden',
 			name: t("command_toggle_ruby_hidden"),
+			icon: 'novel-ruby-toggle-ruby-hidden',
 			callback: async () => {
 				this.settings.hideRuby = !this.settings.hideRuby;
 				await this.saveSettings();
