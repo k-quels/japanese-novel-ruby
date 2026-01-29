@@ -31,11 +31,11 @@ Format example:
 
   
 * Commands:
-    * <img alt="novel-ruby-insert icon" src="https://github.com/user-attachments/assets/b55ebe72-e76a-4945-99aa-3ba046d80d7a" width="18px"> **novel-ruby-insert** : Show a dialog to insert ruby. Set selected text as body.
-    * <img alt="novel-ruby-insert-direct icon" src="https://github.com/user-attachments/assets/b077b267-b96a-4c43-bd73-41e327c7b4da" width="18px"> **novel-ruby-insert-direct** : Insert ruby marks directly in the editor without opening a dialog.
-    * <img alt="novel-ruby-insert-dot icon" src="https://github.com/user-attachments/assets/fd67cc95-3176-4b88-a88b-2639b0b639bd" width="18px"> **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
-    * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/73d05435-808a-4739-b1c1-310f4a89a287" width="18px"> **novel-ruby-remove** : Remove all ruby marks from selected text.
-    * <img alt="novel-ruby-toggle-ruby-hidden icon" src="https://github.com/user-attachments/assets/ff0e0bf6-2056-4f0d-8cc2-2c8c0e2c8b9d" width="18px"> **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
+    * <img alt="novel-ruby-insert icon" src="https://github.com/user-attachments/assets/3d466863-57ce-4ccf-8065-2ec35cec45d2" width="18px"> **novel-ruby-insert** : Show a dialog to insert ruby. Set selected text as body.
+    * <img alt="novel-ruby-insert-direct icon" src="https://github.com/user-attachments/assets/c2b435bc-bac8-4817-bbda-7df0b1142ee2" width="18px"> **novel-ruby-insert-direct** : Insert ruby marks directly in the editor without opening a dialog.
+    * <img alt="novel-ruby-insert-dot icon" src="https://github.com/user-attachments/assets/810914fa-ee20-43b7-8a39-72a04bc84e56" width="18px"> **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
+    * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/b95ad946-f8c6-4ca8-b58b-fed4b491174f" width="18px"> **novel-ruby-remove** : Remove all ruby marks from selected text.
+    * <img alt="novel-ruby-toggle-ruby-hidden icon" src="https://github.com/user-attachments/assets/305a7e18-128b-4868-8dde-a0961ad47b38" width="18px"> **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
 
 ## See Also
 
