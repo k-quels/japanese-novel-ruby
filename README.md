@@ -31,11 +31,11 @@ Format example:
 
   
 * Commands:
-    * **novel-ruby-insert** : Show a dialog to insert ruby. Set selected text as body.
-    * **novel-ruby-insert-direct** : Insert ruby marks directly in the editor without opening a dialog.
-    * **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
-    * **novel-ruby-remove** : Remove all ruby marks from selected text.
-    * **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
+    * <img alt="novel-ruby-insert icon" src="https://github.com/user-attachments/assets/b55ebe72-e76a-4945-99aa-3ba046d80d7a" width="18px"> **novel-ruby-insert** : Show a dialog to insert ruby. Set selected text as body.
+    * <img alt="novel-ruby-insert-direct icon" src="https://github.com/user-attachments/assets/b077b267-b96a-4c43-bd73-41e327c7b4da" width="18px"> **novel-ruby-insert-direct** : Insert ruby marks directly in the editor without opening a dialog.
+    * <img alt="novel-ruby-insert-dot icon" src="https://github.com/user-attachments/assets/fd67cc95-3176-4b88-a88b-2639b0b639bd" width="18px"> **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
+    * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/73d05435-808a-4739-b1c1-310f4a89a287" width="18px"> **novel-ruby-remove** : Remove all ruby marks from selected text.
+    * <img alt="novel-ruby-toggle-ruby-hidden icon" src="https://github.com/user-attachments/assets/ff0e0bf6-2056-4f0d-8cc2-2c8c0e2c8b9d" width="18px"> **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
 
 ## See Also
 
