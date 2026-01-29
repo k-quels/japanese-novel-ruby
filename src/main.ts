@@ -48,11 +48,11 @@ const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 }
 
 const ICON_DATA = {
-    'novel-ruby-insert': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="21" height="21" rx="2" /><path d="M7.5 19.5l4.5-9 4.5 9M9 17h6" /><circle cx="8.5" cy="6.5" r="1.7" /><circle cx="15.5" cy="6.5" r="1.7" /></svg>`,
-    'novel-ruby-insert-direct': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><circle cx="8.5" cy="5" r="1.7" /><circle cx="15.5" cy="5" r="1.7" /></svg>`,
-    'novel-ruby-insert-dot': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><circle cx="12" cy="4.5" r="0.8" fill="currentColor" /></svg>`,
-    'novel-ruby-remove': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><rect x="6" y="3" width="12" height="4" rx="1" stroke-dasharray="1 2.5" /></svg>`,
-    'novel-ruby-toggle-ruby-hidden': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l6-10.5 6 10.5M8 18h8" /><path d="M7 5h3" /><path d="M14 5h3" /></svg>`
+    'novel-ruby-insert': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="21" height="21" rx="2" /><path d="M8.5 20l3.5-7 3.5 7M9.5 18.5h4.5" /><circle cx="8.5" cy="8" r="1.9" /><path d="M10.5 6v4" /><circle cx="15.5" cy="8.5" r="1.7" /><path d="M13.5 4.5v5.5" /></svg>`,
+    'novel-ruby-insert-direct': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><circle cx="8.5" cy="6" r="2.0" /><path d="M10.5 8v-4" /><circle cx="15.5" cy="6.5" r="1.7" /><path d="M13.5 8v-6" /></svg>`,
+    'novel-ruby-insert-dot': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><circle cx="12" cy="6" r="0.8" fill="currentColor" /></svg>`,
+    'novel-ruby-remove': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><rect x="6" y="3" width="12" height="5.5" rx="1" stroke-dasharray="1 2.5" /></svg>`,
+    'novel-ruby-toggle-ruby-hidden': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><path d="M7 7h3" /><path d="M14 7h3" /></svg>`
 };
 
 export default class NovelRubyPlugin extends Plugin {
