@@ -1,5 +1,6 @@
 import { App } from "obsidian";
 import { ViewPlugin, ViewUpdate, Decoration, DecorationSet, EditorView } from '@codemirror/view';
+import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { editorLivePreviewField } from 'obsidian';
 
@@ -125,6 +126,21 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 						}
 						if (inSelection) continue;
 
+						// exclude code blocks and images
+						// Resolve node at (matchStart + 1) to ensure we get the inner node (e.g. InlineCode)
+						// even if the match starts exactly at the node boundary.
+						const node = syntaxTree(view.state).resolve(matchStart + 1);
+						const nodeName = node.name;
+						
+						if (nodeName.includes("Code") || nodeName.includes("code") || nodeName.includes("Image") || nodeName.includes("image")) {
+							continue;
+						}
+						
+						// Also check parent just in case we are inside a text node inside the code block
+						if (node.parent?.name.includes("Code") || node.parent?.name.includes("code") || node.parent?.name.includes("Image") || node.parent?.name.includes("image")) {
+							continue;
+						}
+
 						const body = match.groups?.body1 || match.groups?.body2;
 						const rubyText = match.groups?.ruby;
 
@@ -136,14 +152,38 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 
 						const prefixLength = bodyIndex;
 
+						// Check if the prefix is a half-width pipe followed by a space (Table cell)
+						let isTablePipe = false;
+						if (prefixLength === 1 && fullMatchText[0] === '|' && body.startsWith(' ')) {
+							isTablePipe = true;
+						}
+
 						// 1. Prefix (separator like |)
-						if (prefixLength > 0) {
+						// If it's a table pipe, we do NOT hide it (to preserve table structure)
+						if (prefixLength > 0 && !isTablePipe) {
 							builder.add(matchStart, matchStart + prefixLength, Decoration.replace({}));
 						}
 
 						// 2. Wrap everything in <ruby>
 						const rubyClass = "novel-ruby" + (this.hideRuby ? " ruby-hide" : "");
-						builder.add(matchStart + prefixLength, matchEnd, Decoration.mark({ tagName: "ruby", class: rubyClass }));
+						let rubyContentStart = matchStart + prefixLength;
+						
+						// If it's a table pipe, we check if the body ends with Kanji (or similar)
+						if (isTablePipe) {
+							rubyContentStart += 1; // At least skip the leading space
+							
+							// If body ends with Kanji, we treat only the Kanji part as ruby
+							const kanjiMatch = body.match(/[一-龠々仝〆〇ヶ]+$/);
+							if (kanjiMatch) {
+								const kanjiLength = kanjiMatch[0].length;
+								// If there is non-kanji text before the kanji tail (excluding the leading space)
+								if (body.length - 1 > kanjiLength) {
+									rubyContentStart = matchStart + prefixLength + (body.length - kanjiLength);
+								}
+							}
+						}
+
+						builder.add(rubyContentStart, matchEnd, Decoration.mark({ tagName: "ruby", class: rubyClass }));
 
 						// 3. Start Delimiter (e.g. 《) - Hide it by replacing with empty widget
 						const bodyEndRel = bodyIndex + body.length;

@@ -37,6 +37,11 @@ Format example:
     * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/b95ad946-f8c6-4ca8-b58b-fed4b491174f" width="18px"> **novel-ruby-remove** : Remove all ruby marks from selected text.
     * <img alt="novel-ruby-toggle-ruby-hidden icon" src="https://github.com/user-attachments/assets/305a7e18-128b-4868-8dde-a0961ad47b38" width="18px"> **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
 
+## Limitations
+
+- Using the half-width pipe `|` as a ruby start delimiter inside tables will break the display.
+  - If you want to use ruby inside tables, please make sure to use the full-width pipe `｜`.
+
 ## See Also
 
 This plugin doesn't support markdown ruby format.

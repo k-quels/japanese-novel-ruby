@@ -32,6 +32,11 @@
     * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/b95ad946-f8c6-4ca8-b58b-fed4b491174f" width="18px"> **novel-ruby-remove** : 選択範囲のテキストからすべてのルビ記号を削除します。
     * <img alt="novel-ruby-toggle-ruby-hidden icon" src="https://github.com/user-attachments/assets/305a7e18-128b-4868-8dde-a0961ad47b38" width="18px"> **novel-ruby-toggle-ruby-hidden** : 「ホバー時以外はルビ非表示」設定のON/OFFを切り替えます。
 
+## 制限事項
+
+- テーブル内でルビ本文の開始記号として半角パイプ `|` を使用すると表示が崩れます。
+  - テーブル内でルビを扱いたい場合、必ず全角パイプ `｜` を使用してください。
+
 ## See Also
 
 このプラグインはマークダウン形式のルビ記法に対応していません。

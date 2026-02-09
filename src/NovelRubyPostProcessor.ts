@@ -47,11 +47,9 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 	return element;
 }
 /**
- * Ruby convert MarkdownPostProcessor - for reading view
+ * Ruby convert MarkdownPostProcessor - for reading view & live preview)
  */
 export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext, settings: NovelRubyPluginSettings) => {
-	const searchBlock = e.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ol, ul, table');
-	if (searchBlock.length === 0) return;
 	if (!shouldEnableForNote(settings)) return;
 
 	// function for process all nodes recursively
@@ -71,8 +69,5 @@ export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcesso
 		});
 	}
 
-
-	searchBlock.forEach(block => {
-		replaceRuby(block);
-	})
+	replaceRuby(e);
 }
