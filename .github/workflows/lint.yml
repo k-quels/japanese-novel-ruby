@@ -1,0 +1,28 @@
+name: Lint workflows
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - ".github/workflows/*.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/*.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+
+      - name: Run zizmor
+        uses: woodruffw/zizmor-action@v1
+        with:
+          arguments: ".github/workflows/"
