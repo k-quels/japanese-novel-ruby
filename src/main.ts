@@ -1,4 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Plugin, Setting, Notice, addIcon } from 'obsidian';
+import { Prec } from '@codemirror/state';
 import { novelRubyPostProcessor } from 'src/NovelRubyPostProcessor';
 import { novelRubyExtension } from 'src/NovelRubyViewPlugin';
 import { NovelRubySettingTab } from './NovelRubySettingTab';
@@ -74,7 +75,7 @@ export default class NovelRubyPlugin extends Plugin {
 			novelRubyPostProcessor(el, ctx, this.settings); // affect to reading view
 		});
 
-		this.registerEditorExtension(novelRubyExtension(this.app, this)); // affect to editor (source or live-preview)
+		this.registerEditorExtension(Prec.lowest(novelRubyExtension(this.app, this))); // affect to editor (source or live-preview)
 
 		// Detect frontmatter change & rerender preview (reading-mode)
 		this.registerEvent(

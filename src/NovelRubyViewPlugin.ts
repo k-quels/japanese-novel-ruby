@@ -190,6 +190,11 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 						const startDelimStart = matchStart + bodyEndRel;
 						const startDelimEnd = startDelimStart + startDelim.length;
 
+						// Wrap base text in <rb> to prevent Chromium space auto-segmentation
+						if (startDelimStart > rubyContentStart) {
+							builder.add(rubyContentStart, startDelimStart, Decoration.mark({ tagName: "rb" }));
+						}
+
 						// Check if delim exists in text (it should)
 						if (startDelimStart < startDelimEnd) {
 							builder.add(startDelimStart, startDelimEnd, Decoration.replace({}));

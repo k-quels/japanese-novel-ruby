@@ -33,7 +33,7 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 				rubyNode.addClass('ruby-hide');
 			}
 			rubyNode.addClass('ruby');
-			rubyNode.appendText(body);
+			rubyNode.createEl('rb' as any, { text: body });
 			rubyNode.createEl('rt', { text: ruby });
 			// Replace node
 			if (lastNode.textContent) {
