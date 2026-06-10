@@ -12,6 +12,10 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
 
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -24,17 +28,27 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: Package & Create release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Package
         run: |
           tag="${GITHUB_REF#refs/tags/}"
-
           mkdir "$PLUGIN_NAME"
           cp main.js styles.css manifest.json "$PLUGIN_NAME"
           zip -r "$PLUGIN_NAME-$tag.zip" "$PLUGIN_NAME"
-
-          gh release create "$tag" \
-            --title="$tag" \
+          echo "TAG_NAME=$tag" >> $GITHUB_ENV
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            styles.css
+            manifest.json
+            ${{ env.PLUGIN_NAME }}-${{ env.TAG_NAME }}.zip
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ env.TAG_NAME }}
+        run: |
+          gh release create "$TAG_NAME" \
+            --title="$TAG_NAME" \
             --draft \
-            main.js styles.css manifest.json "$PLUGIN_NAME-$tag.zip"
+            main.js styles.css manifest.json "$PLUGIN_NAME-$TAG_NAME.zip"

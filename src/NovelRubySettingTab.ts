@@ -139,7 +139,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				.setButtonText(t("settings_donate_button"))
 				.setCta()
 				.onClick(() => {
-					setTimeout(
+					window.setTimeout(
 						() => location.replace("https://buymeacoffee.com/quels"), 0
 					);
 				}));

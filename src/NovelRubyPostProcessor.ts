@@ -1,16 +1,16 @@
-import { MarkdownPostProcessorContext } from "obsidian";
+import { App, MarkdownPostProcessorContext } from "obsidian";
 
 import { NovelRubyPluginSettings, RubyRegex } from "./main";
 
-function shouldEnableForNote(settings: NovelRubyPluginSettings): boolean {
+function shouldEnableForNote(app: App, settings: NovelRubyPluginSettings): boolean {
 	if (!settings.enablePerNote) {
 		return true; // enable ruby in all notes / 全局启用
 	}
-	const activeFile = this.app.workspace.getActiveFile();
+	const activeFile = app.workspace.getActiveFile();
 	if (!activeFile) {
 		return false; // does not work if there is no active file / 如果没有活动文件，则功能不生效
 	}
-	const frontmatter = this.app.metadataCache.getFileCache(activeFile)?.frontmatter;
+	const frontmatter = app.metadataCache.getFileCache(activeFile)?.frontmatter;
 	if (frontmatter && frontmatter["enable_ruby"] !== undefined) {
 		return frontmatter["enable_ruby"] === true; // Judging by frontmatter / 根据 frontmatter 判断
 	}
@@ -28,12 +28,12 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 			const ruby = match.groups?.ruby ?? ""; // if there is a match, there must be a ruby
 			const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
 			// Set up ruby tag
-			const rubyNode = document.createElement('ruby');
+			const rubyNode = activeDocument.createElement('ruby');
 			if (hide) {
 				rubyNode.addClass('ruby-hide');
 			}
 			rubyNode.addClass('ruby');
-			rubyNode.createEl('rb' as any, { text: body });
+			rubyNode.createEl('rb' as keyof HTMLElementTagNameMap, { text: body });
 			rubyNode.createEl('rt', { text: ruby });
 			// Replace node
 			if (lastNode.textContent) {
@@ -49,8 +49,8 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 /**
  * Ruby convert MarkdownPostProcessor - for reading view & live preview)
  */
-export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext, settings: NovelRubyPluginSettings) => {
-	if (!shouldEnableForNote(settings)) return;
+export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext, app: App, settings: NovelRubyPluginSettings) => {
+	if (!shouldEnableForNote(app, settings)) return;
 
 	// function for process all nodes recursively
 	function replaceRuby(node: Node) {

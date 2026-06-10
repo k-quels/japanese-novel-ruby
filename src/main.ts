@@ -72,7 +72,7 @@ export default class NovelRubyPlugin extends Plugin {
 		}
 
 		this.registerMarkdownPostProcessor((el, ctx) => {
-			novelRubyPostProcessor(el, ctx, this.settings); // affect to reading view
+			novelRubyPostProcessor(el, ctx, this.app, this.settings); // affect to reading view
 		});
 
 		this.registerEditorExtension(Prec.lowest(novelRubyExtension(this.app, this))); // affect to editor (source or live-preview)
@@ -199,7 +199,7 @@ export default class NovelRubyPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as Partial<NovelRubyPluginSettings>);
 		updateRubySize(this.settings.rubySize);
 	}
 
