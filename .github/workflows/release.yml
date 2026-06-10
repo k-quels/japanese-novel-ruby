@@ -43,6 +43,7 @@ jobs:
             styles.css
             manifest.json
             ${{ env.PLUGIN_NAME }}-${{ env.TAG_NAME }}.zip
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
