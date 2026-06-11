@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: "20.x" # You might need to adjust this value to your own version
           cache: false
+          package-manager-cache: false
       - name: Build
         id: build
         run: |
@@ -39,7 +40,7 @@ jobs:
           zip -r "$PLUGIN_NAME-$tag.zip" "$PLUGIN_NAME"
           echo "TAG_NAME=$tag" >> $GITHUB_ENV
       - name: Attest Build Provenance
-        uses: actions/attest-build-provenance@96b4a1ef7235a096b17240c259729fdd70c83d45
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
         with:
           subject-path: |
             main.js
