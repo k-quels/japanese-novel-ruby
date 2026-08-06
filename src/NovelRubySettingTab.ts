@@ -100,35 +100,36 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					}
 
 					await this.plugin.saveSettings();
-					this.display();
+					customRubyContainerEl.toggle(value);
 				})
 			);
 
-		if (this.plugin.settings.modifyRubyCharacter) {
-			new Setting(containerEl)
-				.setName(t("settings_start_character_ruby_name"))
-				.setDesc(t("settings_start_character_ruby_desc"))
-				.addText(text => text
-					.setValue(this.plugin.settings.startRubyCharacter)
-					.onChange(async (value) => {
-						this.plugin.settings.startRubyCharacter = value;
-						RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
-						await this.plugin.saveSettings();
-					})
-				);
+		const customRubyContainerEl = containerEl.createDiv();
+		customRubyContainerEl.toggle(this.plugin.settings.modifyRubyCharacter);
 
-			new Setting(containerEl)
-				.setName(t("settings_end_character_ruby_name"))
-				.setDesc(t("settings_end_character_ruby_desc"))
-				.addText(text => text
-					.setValue(this.plugin.settings.endRubyCharacter)
-					.onChange(async (value) => {
-						this.plugin.settings.endRubyCharacter = value;
-						RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
-						await this.plugin.saveSettings();
-					})
-				);
-		}
+		new Setting(customRubyContainerEl)
+			.setName(t("settings_start_character_ruby_name"))
+			.setDesc(t("settings_start_character_ruby_desc"))
+			.addText(text => text
+				.setValue(this.plugin.settings.startRubyCharacter)
+				.onChange(async (value) => {
+					this.plugin.settings.startRubyCharacter = value;
+					RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+					await this.plugin.saveSettings();
+				})
+			);
+
+		new Setting(customRubyContainerEl)
+			.setName(t("settings_end_character_ruby_name"))
+			.setDesc(t("settings_end_character_ruby_desc"))
+			.addText(text => text
+				.setValue(this.plugin.settings.endRubyCharacter)
+				.onChange(async (value) => {
+					this.plugin.settings.endRubyCharacter = value;
+					RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+					await this.plugin.saveSettings();
+				})
+			);
 		
 		new Setting(containerEl).setName(t("settings_support_title")).setHeading();
 
