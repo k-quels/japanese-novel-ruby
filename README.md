@@ -31,11 +31,13 @@ Format example:
 
   
 * Commands:
-    * <img alt="novel-ruby-insert icon" src="https://github.com/user-attachments/assets/3d466863-57ce-4ccf-8065-2ec35cec45d2" width="18px"> **novel-ruby-insert** : Show a dialog to insert ruby. Set selected text as body.
-    * <img alt="novel-ruby-insert-direct icon" src="https://github.com/user-attachments/assets/c2b435bc-bac8-4817-bbda-7df0b1142ee2" width="18px"> **novel-ruby-insert-direct** : Insert ruby marks directly in the editor without opening a dialog.
-    * <img alt="novel-ruby-insert-dot icon" src="https://github.com/user-attachments/assets/810914fa-ee20-43b7-8a39-72a04bc84e56" width="18px"> **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
-    * <img alt="novel-ruby-remove icon" src="https://github.com/user-attachments/assets/b95ad946-f8c6-4ca8-b58b-fed4b491174f" width="18px"> **novel-ruby-remove** : Remove all ruby marks from selected text.
-    * <img alt="novel-ruby-toggle-ruby-hidden icon" src="https://github.com/user-attachments/assets/305a7e18-128b-4868-8dde-a0961ad47b38" width="18px"> **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
+    * <img width="18" height="18" alt="novel-ruby-insert_18px" src="https://github.com/user-attachments/assets/6d15aa80-2474-48f7-a2c8-62934bde4c8b" /> **novel-ruby-insert** : Show a dialog to insert ruby. Set selected text as body.
+    * <img width="18" height="18" alt="novel-ruby-insert-direct_18px" src="https://github.com/user-attachments/assets/85d41e06-ce4c-4f26-94d7-ca6a561c0c4f" /> **novel-ruby-insert-direct** : Insert ruby marks directly in the editor without opening a dialog.
+    * <img width="18" height="18" alt="novel-ruby-insert-dot_18px" src="https://github.com/user-attachments/assets/a90dc885-acb4-4763-8cea-7d68442974ad" /> **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
+    * <img width="18" height="18" alt="novel-ruby-remove_18px" src="https://github.com/user-attachments/assets/753ad9d7-92ce-4335-840b-3dd24d98c23f" /> **novel-ruby-remove** : Remove all ruby marks from selected text.
+    * <img width="18" height="18" alt="novel-ruby-toggle-ruby-hidden_18px" src="https://github.com/user-attachments/assets/5e371d0d-66ff-48d9-b6e5-0fc6f44d86b7" /> **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
+    * <img width="18" height="18" alt="novel-ruby-toggle-source-mode-render_18px" src="https://github.com/user-attachments/assets/a6010403-1882-4322-887b-9d429ff06daa" /> **novel-ruby-toggle-source-mode-render** : Toggle 'Enable ruby preview in source mode' setting.
+
 
 ## Limitations
 
