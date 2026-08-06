@@ -2,6 +2,7 @@ export default {
 	command_insert_novel_ruby: "Insert novel ruby",
 	command_insert_novel_ruby_direct: "Insert novel ruby (Direct)",
 	command_toggle_ruby_hidden: "Toggle 'Hide ruby unless hover'",
+	command_toggle_source_mode_render: "Toggle 'Enable ruby preview in source mode'",
 	command_insert_novel_dot: "Insert novel emphasis dot",
 	command_remove_novel_ruby: "Remove novel ruby from selection",
 

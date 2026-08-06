@@ -2,6 +2,7 @@ export default {
 	command_insert_novel_ruby: "插入注音",
 	command_insert_novel_ruby_direct : "直接插入注音符號",
 	command_toggle_ruby_hidden : "切換「只在懸停時顯示注音」設定",
+	command_toggle_source_mode_render: "切換「在源碼模式下顯示注音」設定",
 	command_insert_novel_dot : "插入著重號",
 	command_remove_novel_ruby: "刪除已選取文字的注音",
 

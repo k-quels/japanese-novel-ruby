@@ -2,6 +2,7 @@ export default {
 	command_insert_novel_ruby: "ルビを挿入",
 	command_insert_novel_ruby_direct : "ルビ記号を直接挿入",
 	command_toggle_ruby_hidden : "「ホバー時以外はルビ非表示」設定をトグル",
+	command_toggle_source_mode_render: "「ソースモードでルビを表示」設定をトグル",
 	command_insert_novel_dot : "傍点を挿入",
 	command_remove_novel_ruby: "選択範囲からルビを削除",
 
