@@ -1,4 +1,6 @@
 export default {
+	settings_ruby_size_invalid: "Enter a non-zero number.",
+	
 	command_insert_novel_ruby: "Insert novel ruby",
 	command_insert_novel_ruby_direct: "Insert novel ruby (Direct)",
 	command_toggle_ruby_hidden: "Toggle 'Hide ruby unless hover'",

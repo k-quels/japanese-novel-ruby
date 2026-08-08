@@ -1,4 +1,6 @@
 export default {
+	settings_ruby_size_invalid: "請輸入非零數值",
+	
 	command_insert_novel_ruby: "插入注音",
 	command_insert_novel_ruby_direct : "直接插入注音符號",
 	command_toggle_ruby_hidden : "切換「只在懸停時顯示注音」設定",

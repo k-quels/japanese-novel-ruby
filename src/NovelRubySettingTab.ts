@@ -11,6 +11,157 @@ export class NovelRubySettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
+	getSettingDefinitions(): Record<string, unknown>[] {
+		return [
+			{
+				type: "group",
+				heading: t("settings_display_title"),
+				items: [
+					{
+						name: t("settings_ruby_size_name"),
+						desc: t("settings_ruby_size_desc"),
+						control: {
+							type: "number",
+							key: "rubySize",
+							defaultValue: 0.5,
+							step: 0.01,
+							validate: (value: number) => Number.isFinite(value) && value !== 0 ? undefined : t("settings_ruby_size_invalid"),
+						},
+					},
+					{
+						name: t("settings_source_mode_render_name"),
+						desc: t("settings_source_mode_render_desc"),
+						control: { type: "toggle", key: "sourceModeRendering" },
+					},
+					{
+						name: t("settings_hide_ruby_unless_hover_name"),
+						desc: t("settings_hide_ruby_unless_hover_desc"),
+						control: { type: "toggle", key: "hideRuby" },
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: t("settings_command_title"),
+				items: [
+					{
+						name: t("settings_insert_full_width_separator_name"),
+						desc: t("settings_insert_full_width_separator_desc"),
+						control: { type: "toggle", key: "insertFullWidthMark" },
+					},
+					{
+						name: t("settings_emphashis_dot_name"),
+						desc: t("settings_emphashis_dot_desc"),
+						control: { type: "text", key: "emphasisDot" },
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: t("settings_advanced_title"),
+				items: [
+					{
+						name: t("settings_enable_pernote_name"),
+						desc: t("settings_enable_pernote_desc"),
+						control: { type: "toggle", key: "enablePerNote" },
+					},
+					{
+						name: t("settings_modify_character_ruby_name"),
+						desc: t("settings_modify_character_ruby_desc"),
+						control: { type: "toggle", key: "modifyRubyCharacter" },
+					},
+					{
+						name: t("settings_start_character_ruby_name"),
+						desc: t("settings_start_character_ruby_desc"),
+						visible: () => this.plugin.settings.modifyRubyCharacter,
+						control: { type: "text", key: "startRubyCharacter" },
+					},
+					{
+						name: t("settings_end_character_ruby_name"),
+						desc: t("settings_end_character_ruby_desc"),
+						visible: () => this.plugin.settings.modifyRubyCharacter,
+						control: { type: "text", key: "endRubyCharacter" },
+					},
+				],
+			},
+			{
+				type: "group",
+				heading: t("settings_support_title"),
+				items: [
+					{
+						name: t("settings_donate_name"),
+						desc: t("settings_donate_desc"),
+						render: (setting: Setting) => setting.addButton(button =>
+							button
+								.setButtonText(t("settings_donate_button"))
+								.setCta()
+								.onClick(() => window.setTimeout(
+									() => location.replace("https://buymeacoffee.com/quels"),
+									0,
+								)),
+						),
+					},
+				],
+			},
+		];
+	}
+
+	// Set the value of a control based on the key and value provided.
+	async setControlValue(key: string, value: unknown): Promise<void> {
+		switch (key) {
+			case "rubySize":
+				this.plugin.settings.rubySize = value as number;
+				break;
+			case "hideRuby":
+				this.plugin.settings.hideRuby = value as boolean;
+				break;
+			case "sourceModeRendering":
+				this.plugin.settings.sourceModeRendering = value as boolean;
+				break;
+			case "insertFullWidthMark":
+				this.plugin.settings.insertFullWidthMark = value as boolean;
+				break;
+			case "emphasisDot":
+				this.plugin.settings.emphasisDot = (value as string)[0];
+				break;
+			case "enablePerNote":
+				this.plugin.settings.enablePerNote = value as boolean;
+				break;
+			case "modifyRubyCharacter":
+				this.plugin.settings.modifyRubyCharacter = value as boolean;
+				if (this.plugin.settings.modifyRubyCharacter) {
+					RubyRegex.changeRubyRegexp(
+						this.plugin.settings.startRubyCharacter,
+						this.plugin.settings.endRubyCharacter,
+					);
+				} else {
+					RubyRegex.resetRubyRegexp();
+				}
+				break;
+			case "startRubyCharacter":
+				this.plugin.settings.startRubyCharacter = value as string;
+				RubyRegex.changeRubyRegexp(
+					this.plugin.settings.startRubyCharacter,
+					this.plugin.settings.endRubyCharacter,
+				);
+				break;
+			case "endRubyCharacter":
+				this.plugin.settings.endRubyCharacter = value as string;
+				RubyRegex.changeRubyRegexp(
+					this.plugin.settings.startRubyCharacter,
+					this.plugin.settings.endRubyCharacter,
+				);
+				break;
+			default:
+				return;
+		}
+		await this.plugin.saveSettings();
+		if (key === "modifyRubyCharacter") {
+			(this as unknown as { refreshDomState(): void }).refreshDomState();
+		}
+	}
+
+	// Keep this for Obsidian 1.12 and earlier.
 	display(): void {
 		const { containerEl } = this;
 
@@ -31,15 +182,16 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
-		.setName(t("settings_source_mode_render_name"))
-		.setDesc(t("settings_source_mode_render_desc"))
-		.addToggle(text => text
-			.setValue(this.plugin.settings.sourceModeRendering)
-			.onChange(async (value) => {
-				this.plugin.settings.sourceModeRendering = value;
-				await this.plugin.saveSettings();
-			}));
-		
+			.setName(t("settings_source_mode_render_name"))
+			.setDesc(t("settings_source_mode_render_desc"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.sourceModeRendering)
+				.onChange(async (value) => {
+					this.plugin.settings.sourceModeRendering = value;
+					await this.plugin.saveSettings();
+				})
+			);
+
 		new Setting(containerEl)
 			.setName(t("settings_hide_ruby_unless_hover_name"))
 			.setDesc(t("settings_hide_ruby_unless_hover_desc"))
@@ -49,9 +201,9 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					this.plugin.settings.hideRuby = value;
 					await this.plugin.saveSettings();
 				}));
-		
+
 		new Setting(containerEl).setName(t("settings_command_title")).setHeading();
-		
+
 		new Setting(containerEl)
 			.setName(t("settings_insert_full_width_separator_name"))
 			.setDesc(t("settings_insert_full_width_separator_desc"))
@@ -96,7 +248,10 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					if (!value) {
 						RubyRegex.resetRubyRegexp();
 					} else {
-						RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+						RubyRegex.changeRubyRegexp(
+							this.plugin.settings.startRubyCharacter,
+							this.plugin.settings.endRubyCharacter,
+						);
 					}
 
 					await this.plugin.saveSettings();
@@ -114,7 +269,10 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.startRubyCharacter)
 				.onChange(async (value) => {
 					this.plugin.settings.startRubyCharacter = value;
-					RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+					RubyRegex.changeRubyRegexp(
+						this.plugin.settings.startRubyCharacter,
+						this.plugin.settings.endRubyCharacter,
+					);
 					await this.plugin.saveSettings();
 				})
 			);
@@ -126,11 +284,14 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.endRubyCharacter)
 				.onChange(async (value) => {
 					this.plugin.settings.endRubyCharacter = value;
-					RubyRegex.changeRubyRegexp(this.plugin.settings.startRubyCharacter, this.plugin.settings.endRubyCharacter);
+					RubyRegex.changeRubyRegexp(
+						this.plugin.settings.startRubyCharacter,
+						this.plugin.settings.endRubyCharacter,
+					);
 					await this.plugin.saveSettings();
 				})
 			);
-		
+
 		new Setting(containerEl).setName(t("settings_support_title")).setHeading();
 
 		new Setting(containerEl)

@@ -1,4 +1,6 @@
 export default {
+	settings_ruby_size_invalid: "0 以外の数値を入力してください",
+	
 	command_insert_novel_ruby: "ルビを挿入",
 	command_insert_novel_ruby_direct : "ルビ記号を直接挿入",
 	command_toggle_ruby_hidden : "「ホバー時以外はルビ非表示」設定をトグル",

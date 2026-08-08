@@ -217,12 +217,12 @@ export default class NovelRubyPlugin extends Plugin {
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as Partial<NovelRubyPluginSettings>);
-		updateRubySize(this.settings.rubySize);
+		updateRubySize(this.app, this.settings.rubySize);
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		updateRubySize(this.settings.rubySize);
+		updateRubySize(this.app, this.settings.rubySize);
 		// Flush the changes to all editors
 		this.app.workspace.updateOptions();
 		// Rerender preview (reading-mode)
@@ -302,6 +302,18 @@ export class RubyInsertModal extends Modal {
 /**
  * Update ruby size style
  */
-function updateRubySize(rubySize: number) {
-	activeDocument.body.style.setProperty("--ruby-size", `${rubySize}`);
+function updateRubySize(app: App, rubySize: number) {
+	const size = `${rubySize}`;
+	const documents = new Set<Document>([activeDocument]);
+
+	app.workspace.iterateAllLeaves((leaf) => {
+		documents.add(leaf.view.containerEl.ownerDocument);
+	});
+
+	for (const document of documents) {
+		document.body.style.setProperty("--ruby-size", size);
+		document.querySelectorAll<HTMLElement>("ruby > rt").forEach((rubyText) => {
+			rubyText.style.setProperty("zoom", size);
+		});
+	}
 }

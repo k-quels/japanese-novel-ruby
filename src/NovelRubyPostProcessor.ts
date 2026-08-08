@@ -28,7 +28,7 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 			const ruby = match.groups?.ruby ?? ""; // if there is a match, there must be a ruby
 			const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
 			// Set up ruby tag
-			const rubyNode = activeDocument.createElement('ruby');
+			const rubyNode = activeDocument.createEl('ruby');
 			if (hide) {
 				rubyNode.addClass('ruby-hide');
 			}

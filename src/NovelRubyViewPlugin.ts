@@ -30,6 +30,7 @@ function shouldEnableForNote(plugin: NovelRubyPlugin, view: EditorView, app: App
 export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 	return ViewPlugin.fromClass(class {
 		decorations: DecorationSet;
+		rubySize: number;
 		sourceModeRendering: boolean; // needs to detect setting change
 		hideRuby: boolean;
 		perNoteEnable: boolean; // needs to detect per note setting change
@@ -39,6 +40,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 
 		constructor(view: EditorView) {
 			this.decorations = this.updateDecorations(view);
+			this.rubySize = plugin.settings.rubySize;
 			this.sourceModeRendering = plugin.settings.sourceModeRendering;
 			this.hideRuby = plugin.settings.hideRuby;
 			this.perNoteEnable = plugin.settings.enablePerNote;
@@ -50,12 +52,20 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 		update(update: ViewUpdate) {
 			if (update.docChanged || update.viewportChanged || update.selectionSet ||
 				(update.startState.field(editorLivePreviewField) != update.state.field(editorLivePreviewField)) ||
+				(this.rubySize != plugin.settings.rubySize) ||
+				(this.perNoteEnable != plugin.settings.enablePerNote) ||
 				(!update.startState.field(editorLivePreviewField) && (this.sourceModeRendering != plugin.settings.sourceModeRendering)) ||
 				(this.hideRuby != plugin.settings.hideRuby) ||
 				(this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) ||
 				(this.startRubyCharacter != plugin.settings.startRubyCharacter) ||
 				(this.endRubyCharacter != plugin.settings.endRubyCharacter)) {
 				// apply settings to view plugin (necessary to apply changes as soon as settings are changed)
+				if (this.rubySize != plugin.settings.rubySize) {
+					this.rubySize = plugin.settings.rubySize;
+				}
+				if (this.perNoteEnable != plugin.settings.enablePerNote) {
+					this.perNoteEnable = plugin.settings.enablePerNote;
+				}
 				if (this.sourceModeRendering != plugin.settings.sourceModeRendering) {
 					this.sourceModeRendering = plugin.settings.sourceModeRendering;
 				}
