@@ -157,7 +157,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 						if (!body || !rubyText) continue;
 
 						const fullMatchText = match[0];
-						const bodyIndex = fullMatchText.indexOf(body);
+						const bodyIndex = (fullMatchText.startsWith('|') || fullMatchText.startsWith('｜')) ? 1 : 0;
 						const startDelim = plugin.settings.modifyRubyCharacter ? plugin.settings.startRubyCharacter : "《";
 
 						const prefixLength = bodyIndex;
@@ -168,14 +168,10 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 							isTablePipe = true;
 						}
 
-						// 1. Prefix (separator like |)
-						// If it's a table pipe, we do NOT hide it (to preserve table structure)
-						if (prefixLength > 0 && !isTablePipe) {
-							builder.add(matchStart, matchStart + prefixLength, Decoration.replace({}));
-						}
+						const bodyEndRel = bodyIndex + body.length;
+						const startDelimStart = matchStart + bodyEndRel;
+						const startDelimEnd = startDelimStart + startDelim.length;
 
-						// 2. Wrap everything in <ruby>
-						const rubyClass = "novel-ruby" + (this.hideRuby ? " ruby-hide" : "");
 						let rubyContentStart = matchStart + prefixLength;
 						
 						// If it's a table pipe, we check if the body ends with Kanji (or similar)
@@ -193,27 +189,36 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 							}
 						}
 
+						// Guard: Ensure rubyContentStart is strictly before startDelimStart and matchEnd
+						if (rubyContentStart >= startDelimStart || rubyContentStart >= matchEnd) {
+							continue;
+						}
+
+						// 1. Prefix (separator like |)
+						// If it's a table pipe, we do NOT hide it (to preserve table structure)
+						if (prefixLength > 0 && !isTablePipe && (matchStart + prefixLength > matchStart)) {
+							builder.add(matchStart, matchStart + prefixLength, Decoration.replace({}));
+						}
+
+						// 2. Wrap everything in <ruby>
+						const rubyClass = "novel-ruby" + (this.hideRuby ? " ruby-hide" : "");
 						builder.add(rubyContentStart, matchEnd, Decoration.mark({ tagName: "ruby", class: rubyClass }));
 
 						// 3. Start Delimiter (e.g. 《) - Hide it by replacing with empty widget
-						const bodyEndRel = bodyIndex + body.length;
-						const startDelimStart = matchStart + bodyEndRel;
-						const startDelimEnd = startDelimStart + startDelim.length;
-
 						// Wrap base text in <rb> to prevent Chromium space auto-segmentation
 						if (startDelimStart > rubyContentStart) {
 							builder.add(rubyContentStart, startDelimStart, Decoration.mark({ tagName: "rb" }));
 						}
 
 						// Check if delim exists in text (it should)
-						if (startDelimStart < startDelimEnd) {
+						if (startDelimStart < startDelimEnd && startDelimEnd <= matchEnd) {
 							builder.add(startDelimStart, startDelimEnd, Decoration.replace({}));
 						}
 
 						// 4. Ruby Text -> <rt>
 						const rubyStart = startDelimEnd;
 						const rubyEnd = rubyStart + rubyText.length;
-						if (rubyEnd > rubyStart) {
+						if (rubyEnd > rubyStart && rubyEnd <= matchEnd) {
 							builder.add(rubyStart, rubyEnd, Decoration.mark({ tagName: "rt" }));
 						}
 

@@ -5,6 +5,10 @@ import { novelRubyExtension } from 'src/NovelRubyViewPlugin';
 import { NovelRubySettingTab } from './NovelRubySettingTab';
 import t from "./l10n";
 
+function escapeRegExp(str: string): string {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // Regular expression for japanese novel ruby
 // format type 1 (without prefix): (漢字)(《ふりがな》)
 // format type 2 (with prefix)   : (| or ｜)(any characters except | or ｜)(《ふりがな》)
@@ -12,7 +16,9 @@ export class RubyRegex {
 	static RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》");
 
 	static createRubyRegexp(start: string, end: string) {
-		return new RegExp(`(?:(?:[|｜]?(?<body1>[一-龠々仝〆〇ヶ]+?))|(?:[|｜](?<body2>[^|｜]+?)))${start}(?<ruby>.+?)${end}`, 'gm');
+		const escapedStart = escapeRegExp(start);
+		const escapedEnd = escapeRegExp(end);
+		return new RegExp(`(?:(?:[|｜]?(?<body1>[一-龠々仝〆〇ヶ]+?))|(?:[|｜](?<body2>[^|｜]+?)))${escapedStart}(?<ruby>.+?)${escapedEnd}`, 'gm');
 	}
 
 	static changeRubyRegexp(start: string, end: string) {
