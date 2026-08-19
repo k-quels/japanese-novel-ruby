@@ -18,13 +18,15 @@ export default {
 
 	notice_insert_novel_dot_no_selection: "Selection is required to insert dots",
 
-	settings_display_title: "Display",
+	settings_display_title: "Display and notation",
 	settings_ruby_size_name					: "Ruby size",
 	settings_ruby_size_desc					: "Set the ratio of ruby size to body. (default: 0.5)",
 	settings_source_mode_render_name		: "Enable ruby preview in source mode",
 	settings_source_mode_render_desc		: "Turn off if you want to display ruby marks as is in source mode.",
 	settings_hide_ruby_unless_hover_name	: "Hide ruby unless hover",
 	settings_hide_ruby_unless_hover_desc	: "Ruby is only displayed when the mouse cursor is over it.",
+	settings_use_double_angle_for_emphasis_name	: "Use 《《》》 for emphasis dots",
+	settings_use_double_angle_for_emphasis_desc	: "Add emphasis dots to characters enclosed in 《《》》, and use this notation for the 'Insert emphasis dot' command.",
 
 	settings_command_title: "Command",
 	settings_insert_full_width_separator_name	: "Insert full-width \"｜\" by insert-ruby command",

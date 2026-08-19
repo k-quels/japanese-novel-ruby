@@ -1,6 +1,6 @@
 {
 	"name": "japanese-novel-ruby",
-	"version": "1.6.2",
+	"version": "1.7.0",
 	"description": "Treat ruby(Furigana) ​​marks commonly used in Japanese novels.",
 	"main": "main.js",
 	"scripts": {
@@ -16,7 +16,7 @@
 		"@codemirror/state": "^6.0.0",
 		"@codemirror/view": "^6.0.0",
 		"@types/node": "^16.11.6",
-		"esbuild": "0.17.3",
+		"esbuild": "^0.28.2",
 		"eslint": "^9.39.4",
 		"eslint-plugin-obsidianmd": "^0.4.1",
 		"obsidian": "latest",

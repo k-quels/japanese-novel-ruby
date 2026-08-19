@@ -18,13 +18,15 @@ export default {
 
 	notice_insert_novel_dot_no_selection: "先に傍点を振りたい本文を選択してください",
 
-	settings_display_title: "表示",	
+	settings_display_title: "表示と記法",	
 	settings_ruby_size_name						: "ルビのサイズ",
 	settings_ruby_size_desc						: "本文に対するルビの大きさを比率で指定します (デフォルト: 0.5)",
 	settings_source_mode_render_name			: "ソースモードでルビを表示",
 	settings_source_mode_render_desc			: "ソースモードではルビ記号を入力したままの文字として表示したい場合、オフにしてください",
 	settings_hide_ruby_unless_hover_name		: "ホバー時以外はルビ非表示",
 	settings_hide_ruby_unless_hover_desc		: "マウスカーソルを乗せている時だけルビを表示します",
+	settings_use_double_angle_for_emphasis_name	: "傍点に《《》》を使う",
+	settings_use_double_angle_for_emphasis_desc	: "《《》》で囲まれた文字に傍点をつけ、「傍点を挿入」コマンドでもこの記法を使用します",
 	
 	settings_command_title: "コマンド",
 	settings_insert_full_width_separator_name	: "「ルビを挿入」コマンドで全角の \"｜\" を使う",

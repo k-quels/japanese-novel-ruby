@@ -33,6 +33,38 @@ class RubyWidget extends WidgetType {
 	}
 }
 
+class EmphasisWidget extends WidgetType {
+	constructor(
+		readonly text: string,
+		readonly dot: string,
+		readonly hide: boolean
+	) {
+		super();
+	}
+
+	eq(other: EmphasisWidget) {
+		return other.text === this.text && other.dot === this.dot && other.hide === this.hide;
+	}
+
+	toDOM(view: EditorView): HTMLElement {
+		const span = createSpan({
+			cls: "novel-ruby-emphasis",
+		});
+		for (const char of this.text) {
+			const rubyEl = span.createEl("ruby", {
+				cls: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
+			});
+			rubyEl.createEl("rb" as keyof HTMLElementTagNameMap, { text: char });
+			rubyEl.createEl("rt", { text: this.dot });
+		}
+		return span;
+	}
+
+	ignoreEvent() {
+		return false;
+	}
+}
+
 function shouldEnableForNote(plugin: NovelRubyPlugin, view: EditorView, app: App): boolean {
 	const viewVerified = plugin.settings.sourceModeRendering || view.state.field(editorLivePreviewField);
 
@@ -61,6 +93,9 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 		sourceModeRendering: boolean; // needs to detect setting change
 		hideRuby: boolean;
 		perNoteEnable: boolean; // needs to detect per note setting change
+		currentNoteEnabled: boolean;
+		useDoubleAngleForEmphasis: boolean;
+		emphasisDot: string;
 		modifyRubyCharacter: boolean;
 		startRubyCharacter: string;
 		endRubyCharacter: string;
@@ -71,22 +106,32 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 			this.sourceModeRendering = plugin.settings.sourceModeRendering;
 			this.hideRuby = plugin.settings.hideRuby;
 			this.perNoteEnable = plugin.settings.enablePerNote;
+			this.currentNoteEnabled = shouldEnableForNote(plugin, view, app);
+			this.useDoubleAngleForEmphasis = plugin.settings.useDoubleAngleForEmphasis;
+			this.emphasisDot = plugin.settings.emphasisDot;
 			this.modifyRubyCharacter = plugin.settings.modifyRubyCharacter;
 			this.startRubyCharacter = plugin.settings.startRubyCharacter;
 			this.endRubyCharacter = plugin.settings.endRubyCharacter;
 		}
 
 		update(update: ViewUpdate) {
+			const isNoteEnabled = shouldEnableForNote(plugin, update.view, app);
 			if (update.docChanged || update.viewportChanged || update.selectionSet ||
+				(this.currentNoteEnabled !== isNoteEnabled) ||
 				(update.startState.field(editorLivePreviewField) != update.state.field(editorLivePreviewField)) ||
 				(this.rubySize != plugin.settings.rubySize) ||
 				(this.perNoteEnable != plugin.settings.enablePerNote) ||
 				(!update.startState.field(editorLivePreviewField) && (this.sourceModeRendering != plugin.settings.sourceModeRendering)) ||
 				(this.hideRuby != plugin.settings.hideRuby) ||
+				(this.useDoubleAngleForEmphasis != plugin.settings.useDoubleAngleForEmphasis) ||
+				(this.emphasisDot != plugin.settings.emphasisDot) ||
 				(this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) ||
 				(this.startRubyCharacter != plugin.settings.startRubyCharacter) ||
 				(this.endRubyCharacter != plugin.settings.endRubyCharacter)) {
 				// apply settings to view plugin (necessary to apply changes as soon as settings are changed)
+				if (this.currentNoteEnabled !== isNoteEnabled) {
+					this.currentNoteEnabled = isNoteEnabled;
+				}
 				if (this.rubySize != plugin.settings.rubySize) {
 					this.rubySize = plugin.settings.rubySize;
 				}
@@ -98,6 +143,12 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 				}
 				if (this.hideRuby != plugin.settings.hideRuby) {
 					this.hideRuby = plugin.settings.hideRuby;
+				}
+				if (this.useDoubleAngleForEmphasis != plugin.settings.useDoubleAngleForEmphasis) {
+					this.useDoubleAngleForEmphasis = plugin.settings.useDoubleAngleForEmphasis;
+				}
+				if (this.emphasisDot != plugin.settings.emphasisDot) {
+					this.emphasisDot = plugin.settings.emphasisDot;
 				}
 				if (this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) {
 					this.modifyRubyCharacter = plugin.settings.modifyRubyCharacter;
@@ -154,6 +205,14 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 					const text = line.text;
 					const matches = Array.from(text.matchAll(RubyRegex.RUBY_REGEXP));
 
+					interface DecoratorItem {
+						from: number;
+						to: number;
+						widget: WidgetType;
+					}
+					const items: DecoratorItem[] = [];
+					const occupiedRanges: { from: number; to: number }[] = [];
+
 					for (const match of matches) {
 						if (match.index === undefined) continue;
 
@@ -186,7 +245,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 						}
 
 						const body = match.groups?.body1 || match.groups?.body2;
-						const rubyText = match.groups?.ruby;
+						const rubyText = match.groups?.ruby || match.groups?.ruby1 || match.groups?.ruby2;
 
 						if (!body || !rubyText) continue;
 
@@ -201,6 +260,9 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 
 						// If it's a table pipe, we check if the body ends with Kanji (or similar)
 						if (isTablePipe) {
+							if (this.useDoubleAngleForEmphasis && (rubyText.startsWith('《') || fullMatchText.includes('《《'))) {
+								continue;
+							}
 							widgetStart = matchStart + prefixLength + 1; // At least skip the leading pipe and space
 							
 							// If body ends with Kanji, we treat only the Kanji part as ruby
@@ -216,11 +278,72 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 						}
 
 						if (widgetStart < matchEnd) {
-							builder.add(widgetStart, matchEnd, Decoration.replace({
+							items.push({
+								from: widgetStart,
+								to: matchEnd,
 								widget: new RubyWidget(finalBody, rubyText, this.hideRuby)
-							}));
+							});
+							occupiedRanges.push({ from: matchStart, to: matchEnd });
 						}
 					}
+
+					// Emphasis matches (if enabled)
+					if (this.useDoubleAngleForEmphasis) {
+						const emphasisMatches = Array.from(text.matchAll(RubyRegex.EMPHASIS_REGEXP));
+						for (const match of emphasisMatches) {
+							if (match.index === undefined) continue;
+
+							const matchStart = line.from + match.index;
+							const matchEnd = matchStart + match[0].length;
+
+							// Check if overlapping with already processed ruby
+							const isOverlapping = occupiedRanges.some(range =>
+								(matchStart < range.to && matchEnd > range.from)
+							);
+							if (isOverlapping) continue;
+
+							// exclude selection
+							let inSelection = false;
+							for (const r of selections) {
+								if (r.to >= matchStart && r.from <= matchEnd) {
+									inSelection = true;
+									break;
+								}
+							}
+							if (inSelection) continue;
+
+							// exclude code blocks and images
+							const node = syntaxTree(view.state).resolve(matchStart + 1);
+							const nodeName = node.name;
+							
+							if (nodeName.includes("Code") || nodeName.includes("code") || nodeName.includes("Image") || nodeName.includes("image")) {
+								continue;
+							}
+							
+							if (node.parent?.name.includes("Code") || node.parent?.name.includes("code") || node.parent?.name.includes("Image") || node.parent?.name.includes("image")) {
+								continue;
+							}
+
+							const emphasisText = match.groups?.emphasis;
+							if (!emphasisText) continue;
+
+							items.push({
+								from: matchStart,
+								to: matchEnd,
+								widget: new EmphasisWidget(emphasisText, this.emphasisDot, this.hideRuby)
+							});
+						}
+					}
+
+					// Sort items by position 'from'
+					items.sort((a, b) => a.from - b.from);
+
+					for (const item of items) {
+						builder.add(item.from, item.to, Decoration.replace({
+							widget: item.widget
+						}));
+					}
+
 					pos = line.to + 1;
 				}
 			}

@@ -38,6 +38,11 @@ export class NovelRubySettingTab extends PluginSettingTab {
 						desc: t("settings_hide_ruby_unless_hover_desc"),
 						control: { type: "toggle", key: "hideRuby" },
 					},
+					{
+						name: t("settings_use_double_angle_for_emphasis_name"),
+						desc: t("settings_use_double_angle_for_emphasis_desc"),
+						control: { type: "toggle", key: "useDoubleAngleForEmphasis" },
+					},
 				],
 			},
 			{
@@ -121,6 +126,18 @@ export class NovelRubySettingTab extends PluginSettingTab {
 			case "insertFullWidthMark":
 				this.plugin.settings.insertFullWidthMark = value as boolean;
 				break;
+			case "useDoubleAngleForEmphasis":
+				this.plugin.settings.useDoubleAngleForEmphasis = value as boolean;
+				if (this.plugin.settings.modifyRubyCharacter) {
+					RubyRegex.changeRubyRegexp(
+						this.plugin.settings.startRubyCharacter,
+						this.plugin.settings.endRubyCharacter,
+						this.plugin.settings.useDoubleAngleForEmphasis,
+					);
+				} else {
+					RubyRegex.changeRubyRegexp("《", "》", this.plugin.settings.useDoubleAngleForEmphasis);
+				}
+				break;
 			case "emphasisDot":
 				this.plugin.settings.emphasisDot = (value as string)[0];
 				break;
@@ -133,9 +150,10 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					RubyRegex.changeRubyRegexp(
 						this.plugin.settings.startRubyCharacter,
 						this.plugin.settings.endRubyCharacter,
+						this.plugin.settings.useDoubleAngleForEmphasis,
 					);
 				} else {
-					RubyRegex.resetRubyRegexp();
+					RubyRegex.resetRubyRegexp(this.plugin.settings.useDoubleAngleForEmphasis);
 				}
 				break;
 			case "startRubyCharacter":
@@ -143,6 +161,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				RubyRegex.changeRubyRegexp(
 					this.plugin.settings.startRubyCharacter,
 					this.plugin.settings.endRubyCharacter,
+					this.plugin.settings.useDoubleAngleForEmphasis,
 				);
 				break;
 			case "endRubyCharacter":
@@ -150,6 +169,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				RubyRegex.changeRubyRegexp(
 					this.plugin.settings.startRubyCharacter,
 					this.plugin.settings.endRubyCharacter,
+					this.plugin.settings.useDoubleAngleForEmphasis,
 				);
 				break;
 			default:
@@ -202,6 +222,25 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
+		new Setting(containerEl)
+			.setName(t("settings_use_double_angle_for_emphasis_name"))
+			.setDesc(t("settings_use_double_angle_for_emphasis_desc"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.useDoubleAngleForEmphasis)
+				.onChange(async (value) => {
+					this.plugin.settings.useDoubleAngleForEmphasis = value;
+					if (this.plugin.settings.modifyRubyCharacter) {
+						RubyRegex.changeRubyRegexp(
+							this.plugin.settings.startRubyCharacter,
+							this.plugin.settings.endRubyCharacter,
+							this.plugin.settings.useDoubleAngleForEmphasis,
+						);
+					} else {
+						RubyRegex.changeRubyRegexp("《", "》", this.plugin.settings.useDoubleAngleForEmphasis);
+					}
+					await this.plugin.saveSettings();
+				}));
+
 		new Setting(containerEl).setName(t("settings_command_title")).setHeading();
 
 		new Setting(containerEl)
@@ -245,13 +284,14 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					this.plugin.settings.modifyRubyCharacter = value;
 
 					// Switch the ruby regexp when toggled.
-					if (!value) {
-						RubyRegex.resetRubyRegexp();
-					} else {
+					if (value) {
 						RubyRegex.changeRubyRegexp(
 							this.plugin.settings.startRubyCharacter,
 							this.plugin.settings.endRubyCharacter,
+							this.plugin.settings.useDoubleAngleForEmphasis,
 						);
+					} else {
+						RubyRegex.resetRubyRegexp(this.plugin.settings.useDoubleAngleForEmphasis);
 					}
 
 					await this.plugin.saveSettings();
@@ -272,6 +312,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					RubyRegex.changeRubyRegexp(
 						this.plugin.settings.startRubyCharacter,
 						this.plugin.settings.endRubyCharacter,
+						this.plugin.settings.useDoubleAngleForEmphasis,
 					);
 					await this.plugin.saveSettings();
 				})
@@ -287,6 +328,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					RubyRegex.changeRubyRegexp(
 						this.plugin.settings.startRubyCharacter,
 						this.plugin.settings.endRubyCharacter,
+						this.plugin.settings.useDoubleAngleForEmphasis,
 					);
 					await this.plugin.saveSettings();
 				})

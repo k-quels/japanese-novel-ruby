@@ -18,13 +18,15 @@ export default {
 
 	notice_insert_novel_dot_no_selection: "请先选择需要添加着重号的正文",
 
-	settings_display_title: "显示",	
+	settings_display_title: "显示与记法",	
 	settings_ruby_size_name					: "注音大小",
 	settings_ruby_size_desc					: "以比例指定注音相对于正文的大小 (默认: 0.5)",
 	settings_source_mode_render_name		: "在源码模式下显示注音",
 	settings_source_mode_render_desc		: "如果希望在源码模式下以原始符号显示注音，请关闭此选项",
 	settings_hide_ruby_unless_hover_name	: "只在悬停时显示注音",
 	settings_hide_ruby_unless_hover_desc	: "悬停时显示注音，其他时间隐藏注音",
+	settings_use_double_angle_for_emphasis_name	: "使用《《》》作为着重号",
+	settings_use_double_angle_for_emphasis_desc	: "为《《》》包围的文字添加着重号，并在“插入着重号”命令中使用此记法",
 
 	settings_command_title: "命令",
 	settings_insert_full_width_separator_name	: "“插入注音”命令使用全角“｜”",

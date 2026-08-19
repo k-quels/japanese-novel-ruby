@@ -13,20 +13,44 @@ function escapeRegExp(str: string): string {
 // format type 1 (without prefix): (漢字)(《ふりがな》)
 // format type 2 (with prefix)   : (| or ｜)(any characters except | or ｜)(《ふりがな》)
 export class RubyRegex {
-	static RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》");
+	static RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》", false);
+	static EMPHASIS_REGEXP = RubyRegex.createEmphasisRegexp("《", "》");
 
-	static createRubyRegexp(start: string, end: string) {
+	static createRubyRegexp(start: string, end: string, useDoubleAngleForEmphasis = false) {
 		const escapedStart = escapeRegExp(start);
 		const escapedEnd = escapeRegExp(end);
-		return new RegExp(`(?:(?:[|｜]?(?<body1>[一-龠々仝〆〇ヶ]+?))|(?:[|｜](?<body2>[^|｜]+?)))${escapedStart}(?<ruby>.+?)${escapedEnd}`, 'gm');
+		const rubyPattern = (start !== end)
+			? `(?:[^${escapedStart}${escapedEnd}]+|${escapedStart}[^${escapedEnd}]*${escapedEnd})+`
+			: `.+?`;
+
+		if (useDoubleAngleForEmphasis) {
+			return new RegExp(
+				`(?:(?:(?<body1>[一-龠々仝〆〇ヶ]+?)${escapedStart}(?!${escapedStart})(?<ruby1>${rubyPattern})${escapedEnd})|(?:(?:｜|\\|(?!\\s))(?<body2>[^|｜${escapedStart}]+?)${escapedStart}(?<ruby2>${rubyPattern})${escapedEnd}))`,
+				'gm'
+			);
+		}
+
+		return new RegExp(
+			`(?:(?:[|｜]?(?<body1>[一-龠々仝〆〇ヶ]+?))|(?:(?:｜|\\|(?!\\s))(?<body2>[^|｜${escapedStart}]+?)))${escapedStart}(?<ruby>${rubyPattern})${escapedEnd}`,
+			'gm'
+		);
 	}
 
-	static changeRubyRegexp(start: string, end: string) {
-		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp(start, end);
+	static createEmphasisRegexp(start: string, end: string) {
+		const escapedDoubleStart = escapeRegExp(start + start);
+		const escapedEnd = escapeRegExp(end);
+		const escapedDoubleEnd = escapeRegExp(end + end);
+		return new RegExp(`${escapedDoubleStart}(?<emphasis>[^${escapedEnd}\r\n]+?)${escapedDoubleEnd}`, 'gm');
 	}
 
-	static resetRubyRegexp() {
-		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》");
+	static changeRubyRegexp(start: string, end: string, useDoubleAngleForEmphasis = false) {
+		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp(start, end, useDoubleAngleForEmphasis);
+		RubyRegex.EMPHASIS_REGEXP = RubyRegex.createEmphasisRegexp(start, end);
+	}
+
+	static resetRubyRegexp(useDoubleAngleForEmphasis = false) {
+		RubyRegex.RUBY_REGEXP = RubyRegex.createRubyRegexp("《", "》", useDoubleAngleForEmphasis);
+		RubyRegex.EMPHASIS_REGEXP = RubyRegex.createEmphasisRegexp("《", "》");
 	}
 }
 
@@ -36,6 +60,7 @@ export interface NovelRubyPluginSettings {
 	sourceModeRendering: boolean,
 	insertFullWidthMark: boolean,
 	emphasisDot: string,
+	useDoubleAngleForEmphasis: boolean,
 	enablePerNote: boolean,
 	modifyRubyCharacter: boolean,
 	startRubyCharacter: string,
@@ -48,6 +73,7 @@ const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 	sourceModeRendering: true,
 	insertFullWidthMark: true,
 	emphasisDot: '・',
+	useDoubleAngleForEmphasis: false,
 	enablePerNote: false, // Disable by default
 	modifyRubyCharacter: false,
 	startRubyCharacter: "《",
@@ -75,7 +101,9 @@ export default class NovelRubyPlugin extends Plugin {
 		}
 
 		if (this.settings.modifyRubyCharacter) {
-			RubyRegex.changeRubyRegexp(this.settings.startRubyCharacter, this.settings.endRubyCharacter);
+			RubyRegex.changeRubyRegexp(this.settings.startRubyCharacter, this.settings.endRubyCharacter, this.settings.useDoubleAngleForEmphasis);
+		} else {
+			RubyRegex.changeRubyRegexp("《", "》", this.settings.useDoubleAngleForEmphasis);
 		}
 
 		this.registerMarkdownPostProcessor((el, ctx) => {
@@ -84,17 +112,15 @@ export default class NovelRubyPlugin extends Plugin {
 
 		this.registerEditorExtension(Prec.lowest(novelRubyExtension(this.app, this))); // affect to editor (source or live-preview)
 
-		// Detect frontmatter change & rerender preview (reading-mode)
+		// Detect frontmatter change & rerender preview (reading-mode & live-preview)
+		let debounceTimer: number | null = null;
 		this.registerEvent(
-			this.app.metadataCache.on("changed", (file, data, cache) => {
-				const frontmatter = cache?.frontmatter;
-				if (frontmatter) {
-					if (file === this.app.workspace.getActiveFile()) {
-						const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-						if (view) {
-							view.previewMode.rerender(true);
-						}
-					}
+			this.app.metadataCache.on("changed", (file) => {
+				if (file === this.app.workspace.getActiveFile()) {
+					if (debounceTimer !== null) window.clearTimeout(debounceTimer);
+					debounceTimer = window.setTimeout(() => {
+						this.refreshAllViews();
+					}, 100);
 				}
 			})
 		);
@@ -154,20 +180,24 @@ export default class NovelRubyPlugin extends Plugin {
 				if (sel == '') {
 					new Notice(t("notice_insert_novel_dot_no_selection"), 2000);
 				} else {
-					// Insert emphasis dot per character
-					let withDots = '';
-					const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
 					let start = "《";
 					let end = "》";
 					if (this.settings.modifyRubyCharacter) {
 						start = this.settings.startRubyCharacter;
 						end = this.settings.endRubyCharacter;
 					}
-					sel = removeRuby(sel);
-					for (let c = 0; c < sel.length; c++) {
-						withDots += separateMark + sel[c] + start + this.settings.emphasisDot[0] + end;
+					sel = removeRuby(sel, this.settings.useDoubleAngleForEmphasis);
+					if (this.settings.useDoubleAngleForEmphasis) {
+						editor.replaceSelection(`${start}${start}${sel}${end}${end}`);
+					} else {
+						// Insert emphasis dot per character
+						let withDots = '';
+						const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
+						for (let c = 0; c < sel.length; c++) {
+							withDots += separateMark + sel[c] + start + this.settings.emphasisDot[0] + end;
+						}
+						editor.replaceSelection(withDots);
 					}
-					editor.replaceSelection(withDots);
 				}
 			}
 		});
@@ -177,7 +207,7 @@ export default class NovelRubyPlugin extends Plugin {
 			name: t("command_remove_novel_ruby"),
 			icon: 'novel-ruby-remove',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection(removeRuby(editor.getSelection()));
+				editor.replaceSelection(removeRuby(editor.getSelection(), this.settings.useDoubleAngleForEmphasis));
 			}
 		});
 
@@ -226,29 +256,81 @@ export default class NovelRubyPlugin extends Plugin {
 		updateRubySize(this.app, this.settings.rubySize);
 	}
 
+	refreshAllViews() {
+		for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+			if (leaf.view instanceof MarkdownView) {
+				// Reading view
+				leaf.view.previewMode?.rerender(true);
+
+				// Live preview / Source mode (CodeMirror 6)
+				const viewAny = leaf.view as unknown as {
+					editor?: {
+						cm?: { dispatch: (tr: Record<string, unknown>) => void; requestMeasure?: () => void };
+					};
+					editMode?: {
+						reparse?: () => void;
+						editor?: { cm?: { dispatch: (tr: Record<string, unknown>) => void; requestMeasure?: () => void } };
+					};
+				};
+
+				const cm = viewAny.editor?.cm ?? viewAny.editMode?.editor?.cm;
+				if (cm && typeof cm.dispatch === "function") {
+					cm.dispatch({});
+					if (typeof cm.requestMeasure === "function") {
+						cm.requestMeasure();
+					}
+				}
+
+				if (typeof viewAny.editMode?.reparse === "function") {
+					viewAny.editMode.reparse();
+				}
+
+				// Directly update rendered elements in live-preview (tables, callouts, widgets)
+				leaf.view.containerEl.querySelectorAll<HTMLElement>(".cm-embed-block, .cm-table-widget, .markdown-rendered, .table-wrapper, table").forEach((el) => {
+					novelRubyPostProcessor(el, null, this.app, this.settings);
+				});
+			}
+		}
+	}
+
 	async saveSettings() {
+		if (this.settings.modifyRubyCharacter) {
+			RubyRegex.changeRubyRegexp(
+				this.settings.startRubyCharacter,
+				this.settings.endRubyCharacter,
+				this.settings.useDoubleAngleForEmphasis,
+			);
+		} else {
+			RubyRegex.changeRubyRegexp("《", "》", this.settings.useDoubleAngleForEmphasis);
+		}
+
 		await this.saveData(this.settings);
 		updateRubySize(this.app, this.settings.rubySize);
 		// Flush the changes to all editors
 		this.app.workspace.updateOptions();
-		// Rerender preview (reading-mode)
-		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		if (view) {
-			view.previewMode.rerender(true);
-		}
+
+		this.refreshAllViews();
 	}
 }
 
 /**
  * Remove ruby marks (《any characters》) from input
  * @param inputText string you want to remove ruby marks
+ * @param removeDoubleAngleEmphasis whether to remove 《《...》》 emphasis as well
  * @returns string without ruby marks
  */
-function removeRuby(inputText: string): string {
+export function removeRuby(inputText: string, removeDoubleAngleEmphasis = false): string {
 	let outputText: string = inputText;
-	const matches = Array.from(inputText.matchAll(RubyRegex.RUBY_REGEXP));
+	if (removeDoubleAngleEmphasis) {
+		const emphasisMatches = Array.from(inputText.matchAll(RubyRegex.EMPHASIS_REGEXP));
+		for (const match of emphasisMatches) {
+			const emphasis = match.groups?.emphasis ?? "";
+			outputText = outputText.replace(match[0], emphasis);
+		}
+	}
+	const matches = Array.from(outputText.matchAll(RubyRegex.RUBY_REGEXP));
 	for (const match of matches) {
-		const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
+		const body = match.groups?.body1 || match.groups?.body2 || match.groups?.body3 || "";
 		outputText = outputText.replace(match[0], body);
 	}
 	return outputText;

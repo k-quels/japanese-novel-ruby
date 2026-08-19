@@ -25,47 +25,111 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 		const matches = Array.from(element.textContent.matchAll(RubyRegex.RUBY_REGEXP));
 		let lastNode = element;
 		for (const match of matches) {
-			const ruby = match.groups?.ruby ?? ""; // if there is a match, there must be a ruby
+			const ruby = match.groups?.ruby || match.groups?.ruby1 || match.groups?.ruby2 || ""; // if there is a match, there must be a ruby
 			const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
 			// Set up ruby tag
 			const rubyNode = createEl('ruby', {
-				cls: hide ? 'ruby ruby-hide' : 'ruby'
+				cls: hide ? 'ruby ruby-hide' : 'ruby',
+				attr: { 'data-ruby-raw': match[0] }
 			});
 			rubyNode.createEl('rb' as keyof HTMLElementTagNameMap, { text: body });
 			rubyNode.createEl('rt', { text: ruby });
 			// Replace node
 			if (lastNode.textContent) {
 				const offset = lastNode.textContent.indexOf(match[0]);
-				const nodeToReplace = lastNode.splitText(offset);
-				lastNode = nodeToReplace.splitText(match[0].length);
-				nodeToReplace.replaceWith(rubyNode);
+				if (offset !== -1) {
+					const nodeToReplace = lastNode.splitText(offset);
+					lastNode = nodeToReplace.splitText(match[0].length);
+					nodeToReplace.replaceWith(rubyNode);
+				}
 			}
 		}
 	}
 	return element;
 }
+
+/**
+	Convert emphasis marks (《《...》》) to tag for MarkdownPostProcessor
+*/
+export const convertNovelEmphasis = (element: Text, hide = false, dot = '・'): Node => {
+	if (element.textContent) {
+		const matches = Array.from(element.textContent.matchAll(RubyRegex.EMPHASIS_REGEXP));
+		let lastNode = element;
+		for (const match of matches) {
+			const emphasisText = match.groups?.emphasis ?? "";
+			const container = createSpan({
+				cls: "novel-ruby-emphasis",
+				attr: { 'data-emphasis-raw': match[0] }
+			});
+			for (const char of emphasisText) {
+				const rubyNode = container.createEl('ruby', {
+					cls: hide ? 'ruby ruby-hide' : 'ruby'
+				});
+				rubyNode.createEl('rb' as keyof HTMLElementTagNameMap, { text: char });
+				rubyNode.createEl('rt', { text: dot });
+			}
+
+			if (lastNode.textContent) {
+				const offset = lastNode.textContent.indexOf(match[0]);
+				if (offset !== -1) {
+					const nodeToReplace = lastNode.splitText(offset);
+					lastNode = nodeToReplace.splitText(match[0].length);
+					nodeToReplace.replaceWith(container);
+				}
+			}
+		}
+	}
+	return element;
+}
+
 /**
  * Ruby convert MarkdownPostProcessor - for reading view & live preview)
  */
-export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext, app: App, settings: NovelRubyPluginSettings) => {
-	if (!shouldEnableForNote(app, settings)) return;
+export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcessorContext | null, app: App, settings: NovelRubyPluginSettings) => {
+	// Revert any previously rendered ruby and emphasis elements back to raw text before reprocessing
+	e.querySelectorAll("ruby[data-ruby-raw]").forEach(rubyEl => {
+		const raw = rubyEl.getAttribute("data-ruby-raw");
+		if (raw) {
+			rubyEl.replaceWith(document.createTextNode(raw));
+		}
+	});
+	e.querySelectorAll(".novel-ruby-emphasis[data-emphasis-raw]").forEach(empEl => {
+		const raw = empEl.getAttribute("data-emphasis-raw");
+		if (raw) {
+			empEl.replaceWith(document.createTextNode(raw));
+		}
+	});
 
-	// function for process all nodes recursively
-	function replaceRuby(node: Node) {
-		const children: Text[] = [];
-		// Collect text nodes except code block & ruby
-		node.childNodes.forEach(child => {
-			if (child.nodeType === Node.TEXT_NODE) {
-				children.push(child as Text);
-			} else if (child.hasChildNodes() && child.nodeName !== 'CODE' && child.nodeName !== 'RUBY') {
-				replaceRuby(child);
-			}
-		});
-		// Convert ruby marks to ruby tags
-		children.forEach((child) => {
-			child.replaceWith(convertNovelRuby(child, settings?.hideRuby));
-		});
+	const isEnabled = shouldEnableForNote(app, settings);
+	if (!isEnabled) {
+		return;
 	}
 
-	replaceRuby(e);
+	// function for process all text nodes recursively
+	function processTextNodes(node: Node, processor: (textNode: Text) => void) {
+		const children: Text[] = [];
+		function collect(n: Node) {
+			n.childNodes.forEach(child => {
+				if (child.nodeType === Node.TEXT_NODE) {
+					children.push(child as Text);
+				} else if (child.hasChildNodes() && child.nodeName !== 'CODE' && child.nodeName !== 'RUBY') {
+					collect(child);
+				}
+			});
+		}
+		collect(node);
+		children.forEach(processor);
+	}
+
+	// 1. Convert ruby marks
+	processTextNodes(e, (child) => {
+		convertNovelRuby(child, settings?.hideRuby);
+	});
+
+	// 2. Convert emphasis marks (if enabled)
+	if (settings?.useDoubleAngleForEmphasis) {
+		processTextNodes(e, (child) => {
+			convertNovelEmphasis(child, settings?.hideRuby, settings?.emphasisDot);
+		});
+	}
 }
