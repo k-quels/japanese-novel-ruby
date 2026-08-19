@@ -1,10 +1,37 @@
 import { App } from "obsidian";
-import { ViewPlugin, ViewUpdate, Decoration, DecorationSet, EditorView } from '@codemirror/view';
+import { ViewPlugin, ViewUpdate, Decoration, DecorationSet, EditorView, WidgetType } from '@codemirror/view';
 import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import { editorLivePreviewField } from 'obsidian';
 
 import NovelRubyPlugin, { RubyRegex } from "./main";
+
+class RubyWidget extends WidgetType {
+	constructor(
+		readonly body: string,
+		readonly ruby: string,
+		readonly hide: boolean
+	) {
+		super();
+	}
+
+	eq(other: RubyWidget) {
+		return other.body === this.body && other.ruby === this.ruby && other.hide === this.hide;
+	}
+
+	toDOM(view: EditorView): HTMLElement {
+		const rubyEl = createEl("ruby", {
+			cls: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
+		});
+		rubyEl.createEl("rb" as keyof HTMLElementTagNameMap, { text: this.body });
+		rubyEl.createEl("rt", { text: this.ruby });
+		return rubyEl;
+	}
+
+	ignoreEvent() {
+		return false;
+	}
+}
 
 function shouldEnableForNote(plugin: NovelRubyPlugin, view: EditorView, app: App): boolean {
 	const viewVerified = plugin.settings.sourceModeRendering || view.state.field(editorLivePreviewField);
@@ -108,7 +135,14 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 			let lastLine = -1;
 
 			for (const visibleRange of view.visibleRanges) {
+				let loopCount = 0;
 				for (let pos = visibleRange.from; pos <= visibleRange.to;) {
+					// Safety guard to prevent UI freeze from infinite loops if pos fails to advance
+					loopCount++;
+					if (loopCount > 1000) {
+						break;
+					}
+
 					const line = view.state.doc.lineAt(pos);
 					if (line.number === lastLine) {
 						// this line has already been processed, skip to the next position
@@ -157,26 +191,17 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 						if (!body || !rubyText) continue;
 
 						const fullMatchText = match[0];
-						const bodyIndex = (fullMatchText.startsWith('|') || fullMatchText.startsWith('｜')) ? 1 : 0;
-						const startDelim = plugin.settings.modifyRubyCharacter ? plugin.settings.startRubyCharacter : "《";
-
-						const prefixLength = bodyIndex;
+						const prefixLength = (fullMatchText.startsWith('|') || fullMatchText.startsWith('｜')) ? 1 : 0;
 
 						// Check if the prefix is a half-width pipe followed by a space (Table cell)
-						let isTablePipe = false;
-						if (prefixLength === 1 && fullMatchText[0] === '|' && body.startsWith(' ')) {
-							isTablePipe = true;
-						}
+						const isTablePipe = prefixLength === 1 && fullMatchText[0] === '|' && body.startsWith(' ');
 
-						const bodyEndRel = bodyIndex + body.length;
-						const startDelimStart = matchStart + bodyEndRel;
-						const startDelimEnd = startDelimStart + startDelim.length;
+						let finalBody = body;
+						let widgetStart = matchStart;
 
-						let rubyContentStart = matchStart + prefixLength;
-						
 						// If it's a table pipe, we check if the body ends with Kanji (or similar)
 						if (isTablePipe) {
-							rubyContentStart += 1; // At least skip the leading space
+							widgetStart = matchStart + prefixLength + 1; // At least skip the leading pipe and space
 							
 							// If body ends with Kanji, we treat only the Kanji part as ruby
 							const kanjiMatch = body.match(/[一-龠々仝〆〇ヶ]+$/);
@@ -184,49 +209,16 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 								const kanjiLength = kanjiMatch[0].length;
 								// If there is non-kanji text before the kanji tail (excluding the leading space)
 								if (body.length - 1 > kanjiLength) {
-									rubyContentStart = matchStart + prefixLength + (body.length - kanjiLength);
+									widgetStart = matchStart + prefixLength + (body.length - kanjiLength);
 								}
+								finalBody = kanjiMatch[0];
 							}
 						}
 
-						// Guard: Ensure rubyContentStart is strictly before startDelimStart and matchEnd
-						if (rubyContentStart >= startDelimStart || rubyContentStart >= matchEnd) {
-							continue;
-						}
-
-						// 1. Prefix (separator like |)
-						// If it's a table pipe, we do NOT hide it (to preserve table structure)
-						if (prefixLength > 0 && !isTablePipe && (matchStart + prefixLength > matchStart)) {
-							builder.add(matchStart, matchStart + prefixLength, Decoration.replace({}));
-						}
-
-						// 2. Wrap everything in <ruby>
-						const rubyClass = "novel-ruby" + (this.hideRuby ? " ruby-hide" : "");
-						builder.add(rubyContentStart, matchEnd, Decoration.mark({ tagName: "ruby", class: rubyClass }));
-
-						// 3. Start Delimiter (e.g. 《) - Hide it by replacing with empty widget
-						// Wrap base text in <rb> to prevent Chromium space auto-segmentation
-						if (startDelimStart > rubyContentStart) {
-							builder.add(rubyContentStart, startDelimStart, Decoration.mark({ tagName: "rb" }));
-						}
-
-						// Check if delim exists in text (it should)
-						if (startDelimStart < startDelimEnd && startDelimEnd <= matchEnd) {
-							builder.add(startDelimStart, startDelimEnd, Decoration.replace({}));
-						}
-
-						// 4. Ruby Text -> <rt>
-						const rubyStart = startDelimEnd;
-						const rubyEnd = rubyStart + rubyText.length;
-						if (rubyEnd > rubyStart && rubyEnd <= matchEnd) {
-							builder.add(rubyStart, rubyEnd, Decoration.mark({ tagName: "rt" }));
-						}
-
-						// 5. End Delimiter (e.g. 》) - Hide it by replacing with empty widget
-						const endDelimStart = rubyEnd;
-						const endDelimEnd = matchStart + match[0].length;
-						if (endDelimEnd > endDelimStart) {
-							builder.add(endDelimStart, endDelimEnd, Decoration.replace({}));
+						if (widgetStart < matchEnd) {
+							builder.add(widgetStart, matchEnd, Decoration.replace({
+								widget: new RubyWidget(finalBody, rubyText, this.hideRuby)
+							}));
 						}
 					}
 					pos = line.to + 1;
