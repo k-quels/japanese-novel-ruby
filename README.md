@@ -26,6 +26,7 @@ Format example:
   - Enable / disable ruby preview in source mode via plugin settings.
   - Ruby can be enabled for specific notes only. (Turn on the option and set the property "enable_ruby: true") (from ver. 1.2.0)
   - You can change the ruby marks for non-Japanese novel use. e.g. 《》 → 【】 (from ver. 1.2.0)
+  - Optionally supports double delimiters (`《《...》》` or custom brackets) for emphasis dots (Bouten). (from ver. 1.7.0)
 - The user interface is available in English / Japanese / Simplified Chinese / Traditional Chinese.
 
 
