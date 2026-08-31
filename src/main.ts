@@ -20,18 +20,18 @@ export class RubyRegex {
 		const escapedStart = escapeRegExp(start);
 		const escapedEnd = escapeRegExp(end);
 		const rubyPattern = (start !== end)
-			? `(?:[^${escapedStart}${escapedEnd}]+|${escapedStart}[^${escapedEnd}]*${escapedEnd})+`
-			: `.+?`;
+			? `(?:[^${escapedStart}${escapedEnd}\r\n]+(?:${escapedStart}[^${escapedEnd}\r\n]*${escapedEnd}[^${escapedStart}${escapedEnd}\r\n]*)*|${escapedStart}[^${escapedEnd}\r\n]*${escapedEnd}(?:[^${escapedStart}${escapedEnd}\r\n]+${escapedStart}[^${escapedEnd}\r\n]*${escapedEnd})*[^${escapedStart}${escapedEnd}\r\n]*)`
+			: `[^\r\n]+?`;
 
 		if (useDoubleAngleForEmphasis) {
 			return new RegExp(
-				`(?:(?:(?<body1>[一-龠々仝〆〇ヶ]+?)${escapedStart}(?!${escapedStart})(?<ruby1>${rubyPattern})${escapedEnd})|(?:(?:｜|\\|(?!\\s))(?<body2>[^|｜${escapedStart}]+?)${escapedStart}(?<ruby2>${rubyPattern})${escapedEnd}))`,
+				`(?:(?:(?<body1>[一-龠々仝〆〇ヶ]+?)${escapedStart}(?!${escapedStart})(?<ruby1>${rubyPattern})${escapedEnd})|(?:(?:｜|\\|(?!\\s))(?<body2>[^|｜${escapedStart}\r\n]+?)${escapedStart}(?<ruby2>${rubyPattern})${escapedEnd}))`,
 				'gm'
 			);
 		}
 
 		return new RegExp(
-			`(?:(?:[|｜]?(?<body1>[一-龠々仝〆〇ヶ]+?))|(?:(?:｜|\\|(?!\\s))(?<body2>[^|｜${escapedStart}]+?)))${escapedStart}(?<ruby>${rubyPattern})${escapedEnd}`,
+			`(?:(?:[|｜]?(?<body1>[一-龠々仝〆〇ヶ]+?))|(?:(?:｜|\\|(?!\\s))(?<body2>[^|｜${escapedStart}\r\n]+?)))${escapedStart}(?<ruby>${rubyPattern})${escapedEnd}`,
 			'gm'
 		);
 	}
