@@ -131,8 +131,8 @@ export default class NovelRubyPlugin extends Plugin {
 			name: t("command_insert_novel_ruby"),
 			icon: 'novel-ruby-insert',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const body = removeRuby(editor.getSelection());
-				new RubyInsertModal(this.app, body, (insertBody, insertRuby) => {
+				const { body, ruby } = parseRuby(editor.getSelection());
+				new RubyInsertModal(this.app, body, ruby, (insertBody, insertRuby) => {
 					const separateMark = this.settings.insertFullWidthMark ? "｜" : "|";
 					let start = "《";
 					let end = "》";
@@ -337,17 +337,36 @@ export function removeRuby(inputText: string, removeDoubleAngleEmphasis = false)
 }
 
 /**
+ * Parse ruby format text to body and ruby parts.
+ */
+export function parseRuby(inputText: string): { body: string; ruby: string } {
+	const trimmed = inputText.trim();
+	const matches = Array.from(trimmed.matchAll(RubyRegex.RUBY_REGEXP));
+	if (matches.length === 1 && matches[0][0] === trimmed) {
+		const match = matches[0];
+		const body = match.groups?.body1 || match.groups?.body2 || match.groups?.body3 || "";
+		const ruby = match.groups?.ruby || match.groups?.ruby1 || match.groups?.ruby2 || "";
+		return { body, ruby };
+	}
+	return {
+		body: removeRuby(inputText),
+		ruby: ""
+	};
+}
+
+/**
  * Display ruby insert modal
  */
 export class RubyInsertModal extends Modal {
 	body: string;
-	ruby: string;
+	ruby: string = "";
 	onSubmit: (body: string, ruby: string) => void;
 
-	constructor(app: App, defaultBody: string, onSubmit: (body: string, ruby: string) => void) {
+	constructor(app: App, defaultBody: string, defaultRuby: string = "", onSubmit: (body: string, ruby: string) => void) {
 		super(app);
 		this.onSubmit = onSubmit;
 		this.body = defaultBody;
+		this.ruby = defaultRuby;
 	}
 
 	onOpen() {
@@ -355,20 +374,46 @@ export class RubyInsertModal extends Modal {
 
 		contentEl.createEl("h1", { text: t("ruby_insert_modal_title") });
 
+		let bodyInputEl: HTMLInputElement | null = null;
+		let rubyInputEl: HTMLInputElement | null = null;
+		const hasInitialBody = Boolean(this.body && this.body.length > 0);
+
 		new Setting(contentEl)
 			.setName(t("ruby_insert_modal_body"))
-			.addText((text) => text
-				.setValue(this.body)
-				.onChange((value) => {
-					this.body = value
-				}));
+			.addText((text) => {
+				bodyInputEl = text.inputEl;
+				text
+					.setValue(this.body)
+					.onChange((value) => {
+						this.body = value;
+					});
+				text.inputEl.addEventListener("keydown", (evt: KeyboardEvent) => {
+					if (evt.key === "Enter" && !evt.isComposing) {
+						evt.preventDefault();
+						if (rubyInputEl) {
+							rubyInputEl.focus();
+						}
+					}
+				});
+			});
 
 		new Setting(contentEl)
 			.setName(t("ruby_insert_modal_ruby"))
-			.addText((text) =>
-				text.onChange((value) => {
-					this.ruby = value
-				}));
+			.addText((text) => {
+				rubyInputEl = text.inputEl;
+				text
+					.setValue(this.ruby)
+					.onChange((value) => {
+						this.ruby = value;
+					});
+				text.inputEl.addEventListener("keydown", (evt: KeyboardEvent) => {
+					if (evt.key === "Enter" && !evt.isComposing) {
+						evt.preventDefault();
+						this.close();
+						this.onSubmit(this.body, this.ruby);
+					}
+				});
+			});
 
 		new Setting(contentEl)
 			.addButton((btn) =>
@@ -379,6 +424,21 @@ export class RubyInsertModal extends Modal {
 						this.close();
 						this.onSubmit(this.body, this.ruby);
 					}));
+
+		window.setTimeout(() => {
+			if (hasInitialBody) {
+				if (rubyInputEl) {
+					rubyInputEl.focus();
+					if (this.ruby) {
+						rubyInputEl.select();
+					}
+				}
+			} else {
+				if (bodyInputEl) {
+					bodyInputEl.focus();
+				}
+			}
+		}, 0);
 	}
 
 	onClose() {
