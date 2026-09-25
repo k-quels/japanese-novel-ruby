@@ -57,6 +57,7 @@ export class RubyRegex {
 export interface NovelRubyPluginSettings {
 	rubySize: number,
 	hideRuby: boolean,
+	hideRubyAlways: boolean,
 	sourceModeRendering: boolean,
 	insertFullWidthMark: boolean,
 	emphasisDot: string,
@@ -70,6 +71,7 @@ export interface NovelRubyPluginSettings {
 const DEFAULT_SETTINGS: NovelRubyPluginSettings = {
 	rubySize: 0.5,
 	hideRuby: false,
+	hideRubyAlways: false,
 	sourceModeRendering: true,
 	insertFullWidthMark: true,
 	emphasisDot: '・',
@@ -86,6 +88,7 @@ const ICON_DATA = {
     'novel-ruby-insert-dot': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><circle cx="12" cy="6" r="0.8" fill="currentColor" /></svg>`,
     'novel-ruby-remove': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><rect x="6" y="3" width="12" height="5.5" rx="1" stroke-dasharray="1 2.5" /></svg>`,
     'novel-ruby-toggle-ruby-hidden': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><path d="M7 7h3" /><path d="M14 7h3" /></svg>`,
+    'novel-ruby-toggle-ruby-hidden-always': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><path d="M6.5 4.5l11 6" /><path d="M17.5 4.5l-11 6" /></svg>`,
     'novel-ruby-toggle-source-mode-render': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m 7.5,21.0 4.5,-8.6 4.5,8.6 M 8.8,18.7 h 6.3" /><path d="M 7.2,7.1 H 10.0" /><path d="m 13.9,7.1 h 2.8" /><path d="M 5.1,13.0 1.0,17.2 5.1,21.3" /><path d="m 18.8,13.0 4.1,4.2 -4.1,4.1" /></svg>`
 };
 
@@ -223,6 +226,22 @@ export default class NovelRubyPlugin extends Plugin {
 					this.settings.hideRuby 
 						? t("settings_hide_ruby_unless_hover_name") + ": " + t("state_on")
 						: t("settings_hide_ruby_unless_hover_name") + ": " + t("state_off")
+				);
+			}
+		});
+
+		// Toggle hide ruby completely
+		this.addCommand({
+			id: 'novel-ruby-toggle-ruby-hidden-always',
+			name: t("command_toggle_hide_ruby"),
+			icon: 'novel-ruby-toggle-ruby-hidden-always',
+			callback: async () => {
+				this.settings.hideRubyAlways = !this.settings.hideRubyAlways;
+				await this.saveSettings();
+				new Notice(
+					this.settings.hideRubyAlways
+						? t("settings_hide_ruby_name") + ": " + t("state_on")
+						: t("settings_hide_ruby_name") + ": " + t("state_off")
 				);
 			}
 		});

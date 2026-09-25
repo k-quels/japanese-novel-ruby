@@ -39,6 +39,11 @@ export class NovelRubySettingTab extends PluginSettingTab {
 						control: { type: "toggle", key: "hideRuby" },
 					},
 					{
+						name: t("settings_hide_ruby_name"),
+						desc: t("settings_hide_ruby_desc"),
+						control: { type: "toggle", key: "hideRubyAlways" },
+					},
+					{
 						name: t("settings_use_double_angle_for_emphasis_name"),
 						desc: t("settings_use_double_angle_for_emphasis_desc"),
 						control: { type: "toggle", key: "useDoubleAngleForEmphasis" },
@@ -119,6 +124,9 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				break;
 			case "hideRuby":
 				this.plugin.settings.hideRuby = value as boolean;
+				break;
+			case "hideRubyAlways":
+				this.plugin.settings.hideRubyAlways = value as boolean;
 				break;
 			case "sourceModeRendering":
 				this.plugin.settings.sourceModeRendering = value as boolean;
@@ -219,6 +227,16 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.hideRuby)
 				.onChange(async (value) => {
 					this.plugin.settings.hideRuby = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName(t("settings_hide_ruby_name"))
+			.setDesc(t("settings_hide_ruby_desc"))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.hideRubyAlways)
+				.onChange(async (value) => {
+					this.plugin.settings.hideRubyAlways = value;
 					await this.plugin.saveSettings();
 				}));
 

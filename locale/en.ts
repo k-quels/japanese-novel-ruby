@@ -4,6 +4,7 @@ export default {
 	command_insert_novel_ruby: "Insert novel ruby",
 	command_insert_novel_ruby_direct: "Insert novel ruby (Direct)",
 	command_toggle_ruby_hidden: "Toggle 'Hide ruby unless hover'",
+	command_toggle_hide_ruby: "Toggle 'Hide ruby'",
 	command_toggle_source_mode_render: "Toggle 'Enable ruby preview in source mode'",
 	command_insert_novel_dot: "Insert novel emphasis dot",
 	command_remove_novel_ruby: "Remove novel ruby from selection",
@@ -25,6 +26,8 @@ export default {
 	settings_source_mode_render_desc		: "Turn off if you want to display ruby marks as is in source mode.",
 	settings_hide_ruby_unless_hover_name	: "Hide ruby unless hover",
 	settings_hide_ruby_unless_hover_desc	: "Ruby is only displayed when the mouse cursor is over it.",
+	settings_hide_ruby_name					: "Hide ruby",
+	settings_hide_ruby_desc					: "Ruby is always hidden, even when the mouse cursor is over it.",
 	settings_use_double_angle_for_emphasis_name	: "Use 《《》》 for emphasis dots",
 	settings_use_double_angle_for_emphasis_desc	: "Add emphasis dots to characters enclosed in 《《》》, and use this notation for the 'Insert emphasis dot' command.",
 

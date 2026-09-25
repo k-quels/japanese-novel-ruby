@@ -10,18 +10,21 @@ class RubyWidget extends WidgetType {
 	constructor(
 		readonly body: string,
 		readonly ruby: string,
-		readonly hide: boolean
+		readonly hide: boolean,
+		readonly hideAlways: boolean
 	) {
 		super();
 	}
 
 	eq(other: RubyWidget) {
-		return other.body === this.body && other.ruby === this.ruby && other.hide === this.hide;
+		return other.body === this.body && other.ruby === this.ruby && other.hide === this.hide && other.hideAlways === this.hideAlways;
 	}
 
 	toDOM(view: EditorView): HTMLElement {
 		const rubyEl = createEl("ruby", {
-			cls: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
+			cls: this.hideAlways
+				? "novel-ruby ruby-hide ruby-hide-always"
+				: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
 		});
 		rubyEl.createEl("rb" as keyof HTMLElementTagNameMap, { text: this.body });
 		rubyEl.createEl("rt", { text: this.ruby });
@@ -37,13 +40,14 @@ class EmphasisWidget extends WidgetType {
 	constructor(
 		readonly text: string,
 		readonly dot: string,
-		readonly hide: boolean
+		readonly hide: boolean,
+		readonly hideAlways: boolean
 	) {
 		super();
 	}
 
 	eq(other: EmphasisWidget) {
-		return other.text === this.text && other.dot === this.dot && other.hide === this.hide;
+		return other.text === this.text && other.dot === this.dot && other.hide === this.hide && other.hideAlways === this.hideAlways;
 	}
 
 	toDOM(view: EditorView): HTMLElement {
@@ -52,7 +56,9 @@ class EmphasisWidget extends WidgetType {
 		});
 		for (const char of this.text) {
 			const rubyEl = span.createEl("ruby", {
-				cls: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
+				cls: this.hideAlways
+					? "novel-ruby ruby-hide ruby-hide-always"
+					: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
 			});
 			rubyEl.createEl("rb" as keyof HTMLElementTagNameMap, { text: char });
 			rubyEl.createEl("rt", { text: this.dot });
@@ -92,6 +98,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 		rubySize: number;
 		sourceModeRendering: boolean; // needs to detect setting change
 		hideRuby: boolean;
+		hideRubyAlways: boolean;
 		perNoteEnable: boolean; // needs to detect per note setting change
 		currentNoteEnabled: boolean;
 		useDoubleAngleForEmphasis: boolean;
@@ -105,6 +112,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 			this.rubySize = plugin.settings.rubySize;
 			this.sourceModeRendering = plugin.settings.sourceModeRendering;
 			this.hideRuby = plugin.settings.hideRuby;
+			this.hideRubyAlways = plugin.settings.hideRubyAlways;
 			this.perNoteEnable = plugin.settings.enablePerNote;
 			this.currentNoteEnabled = shouldEnableForNote(plugin, view, app);
 			this.useDoubleAngleForEmphasis = plugin.settings.useDoubleAngleForEmphasis;
@@ -123,6 +131,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 				(this.perNoteEnable != plugin.settings.enablePerNote) ||
 				(!update.startState.field(editorLivePreviewField) && (this.sourceModeRendering != plugin.settings.sourceModeRendering)) ||
 				(this.hideRuby != plugin.settings.hideRuby) ||
+				(this.hideRubyAlways != plugin.settings.hideRubyAlways) ||
 				(this.useDoubleAngleForEmphasis != plugin.settings.useDoubleAngleForEmphasis) ||
 				(this.emphasisDot != plugin.settings.emphasisDot) ||
 				(this.modifyRubyCharacter != plugin.settings.modifyRubyCharacter) ||
@@ -143,6 +152,9 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 				}
 				if (this.hideRuby != plugin.settings.hideRuby) {
 					this.hideRuby = plugin.settings.hideRuby;
+				}
+				if (this.hideRubyAlways != plugin.settings.hideRubyAlways) {
+					this.hideRubyAlways = plugin.settings.hideRubyAlways;
 				}
 				if (this.useDoubleAngleForEmphasis != plugin.settings.useDoubleAngleForEmphasis) {
 					this.useDoubleAngleForEmphasis = plugin.settings.useDoubleAngleForEmphasis;
@@ -281,7 +293,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 							items.push({
 								from: widgetStart,
 								to: matchEnd,
-								widget: new RubyWidget(finalBody, rubyText, this.hideRuby)
+								widget: new RubyWidget(finalBody, rubyText, this.hideRuby, this.hideRubyAlways)
 							});
 							occupiedRanges.push({ from: matchStart, to: matchEnd });
 						}
@@ -330,7 +342,7 @@ export function novelRubyExtension(app: App, plugin: NovelRubyPlugin) {
 							items.push({
 								from: matchStart,
 								to: matchEnd,
-								widget: new EmphasisWidget(emphasisText, this.emphasisDot, this.hideRuby)
+								widget: new EmphasisWidget(emphasisText, this.emphasisDot, this.hideRuby, this.hideRubyAlways)
 							});
 						}
 					}

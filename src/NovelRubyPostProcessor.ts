@@ -20,7 +20,7 @@ function shouldEnableForNote(app: App, settings: NovelRubyPluginSettings): boole
 /**
 	Convert ruby marks to tag for MarkdownPostProcessor
 */
-export const convertNovelRuby = (element: Text, hide = false): Node => {
+export const convertNovelRuby = (element: Text, hide = false, hideAlways = false): Node => {
 	if (element.textContent) {
 		const matches = Array.from(element.textContent.matchAll(RubyRegex.RUBY_REGEXP));
 		let lastNode = element;
@@ -29,7 +29,7 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 			const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
 			// Set up ruby tag
 			const rubyNode = createEl('ruby', {
-				cls: hide ? 'ruby ruby-hide' : 'ruby',
+				cls: hideAlways ? 'ruby ruby-hide ruby-hide-always' : hide ? 'ruby ruby-hide' : 'ruby',
 				attr: { 'data-ruby-raw': match[0] }
 			});
 			rubyNode.createEl('rb' as keyof HTMLElementTagNameMap, { text: body });
@@ -51,7 +51,7 @@ export const convertNovelRuby = (element: Text, hide = false): Node => {
 /**
 	Convert emphasis marks (《《...》》) to tag for MarkdownPostProcessor
 */
-export const convertNovelEmphasis = (element: Text, hide = false, dot = '・'): Node => {
+export const convertNovelEmphasis = (element: Text, hide = false, hideAlways = false, dot = '・'): Node => {
 	if (element.textContent) {
 		const matches = Array.from(element.textContent.matchAll(RubyRegex.EMPHASIS_REGEXP));
 		let lastNode = element;
@@ -63,7 +63,7 @@ export const convertNovelEmphasis = (element: Text, hide = false, dot = '・'): 
 			});
 			for (const char of emphasisText) {
 				const rubyNode = container.createEl('ruby', {
-					cls: hide ? 'ruby ruby-hide' : 'ruby'
+					cls: hideAlways ? 'ruby ruby-hide ruby-hide-always' : hide ? 'ruby ruby-hide' : 'ruby'
 				});
 				rubyNode.createEl('rb' as keyof HTMLElementTagNameMap, { text: char });
 				rubyNode.createEl('rt', { text: dot });
@@ -123,13 +123,13 @@ export const novelRubyPostProcessor = (e: HTMLElement, ctx: MarkdownPostProcesso
 
 	// 1. Convert ruby marks
 	processTextNodes(e, (child) => {
-		convertNovelRuby(child, settings?.hideRuby);
+		convertNovelRuby(child, settings?.hideRuby, settings?.hideRubyAlways);
 	});
 
 	// 2. Convert emphasis marks (if enabled)
 	if (settings?.useDoubleAngleForEmphasis) {
 		processTextNodes(e, (child) => {
-			convertNovelEmphasis(child, settings?.hideRuby, settings?.emphasisDot);
+			convertNovelEmphasis(child, settings?.hideRuby, settings?.hideRubyAlways, settings?.emphasisDot);
 		});
 	}
 }

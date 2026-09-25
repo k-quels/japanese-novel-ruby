@@ -10,3 +10,7 @@ ruby.ruby-hide rt {
 ruby.ruby-hide:hover rt {
 	opacity: 100%;
 }
+
+ruby.ruby-hide-always rt {
+	display: none;
+}

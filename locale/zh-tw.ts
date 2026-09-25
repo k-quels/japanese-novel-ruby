@@ -4,6 +4,7 @@ export default {
 	command_insert_novel_ruby: "插入注音",
 	command_insert_novel_ruby_direct : "直接插入注音符號",
 	command_toggle_ruby_hidden : "切換「只在懸停時顯示注音」設定",
+	command_toggle_hide_ruby : "切換「隱藏注音」設定",
 	command_toggle_source_mode_render: "切換「在源碼模式下顯示注音」設定",
 	command_insert_novel_dot : "插入著重號",
 	command_remove_novel_ruby: "刪除已選取文字的注音",
@@ -25,6 +26,8 @@ export default {
 	settings_source_mode_render_desc		: "如果希望在源碼模式下以原始符號顯示注音，請關閉此選項",
 	settings_hide_ruby_unless_hover_name	: "只在懸停時顯示注音",
 	settings_hide_ruby_unless_hover_desc	: "懸停時顯示注音，其他時間隱藏注音",
+	settings_hide_ruby_name					: "隱藏注音",
+	settings_hide_ruby_desc					: "始終隱藏注音，懸停時也不顯示",
 	settings_use_double_angle_for_emphasis_name	: "使用《《》》作為著重號",
 	settings_use_double_angle_for_emphasis_desc	: "為《《》》包圍的文字添加著重號，並在「插入著重號」命令中使用此記法",
 
