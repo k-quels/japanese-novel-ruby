@@ -32,7 +32,7 @@
     * <img width="18" height="18" alt="novel-ruby-insert-dot_18px" src="https://github.com/user-attachments/assets/a90dc885-acb4-4763-8cea-7d68442974ad" /> **novel-ruby-insert-dot** : 選択テキストに傍点を振ります。傍点の文字は設定で変更できます。
     * <img width="18" height="18" alt="novel-ruby-remove_18px" src="https://github.com/user-attachments/assets/753ad9d7-92ce-4335-840b-3dd24d98c23f" /> **novel-ruby-remove** : 選択範囲のテキストからすべてのルビ記号を削除します。
     * <img width="18" height="18" alt="novel-ruby-toggle-ruby-hidden_18px" src="https://github.com/user-attachments/assets/5e371d0d-66ff-48d9-b6e5-0fc6f44d86b7" /> **novel-ruby-toggle-ruby-hidden** : 「ホバー時以外はルビ非表示」設定のON/OFFを切り替えます。
-    * **novel-ruby-toggle-ruby-hidden-always** : 「非編集時にルビを非表示」設定のON/OFFを切り替えます。
+    * <img width="18" height="18" alt="icon_ruby-hidden-always_18px" src="https://github.com/user-attachments/assets/904fbcd2-fda3-46c3-9a92-78b8bdce4ce0" /> **novel-ruby-toggle-ruby-hidden-always** : 「非編集時にルビを非表示」設定のON/OFFを切り替えます。
     * <img width="18" height="18" alt="novel-ruby-toggle-source-mode-render_18px" src="https://github.com/user-attachments/assets/a6010403-1882-4322-887b-9d429ff06daa" /> **novel-ruby-toggle-source-mode-render** : 「ソースモードでルビを表示」設定のON/OFFを切り替えます。
 
 ## 制限事項
