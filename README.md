@@ -37,7 +37,7 @@ Format example:
     * <img width="18" height="18" alt="novel-ruby-insert-dot_18px" src="https://github.com/user-attachments/assets/a90dc885-acb4-4763-8cea-7d68442974ad" /> **novel-ruby-insert-dot** : Insert emphasis dots in selected text.
     * <img width="18" height="18" alt="novel-ruby-remove_18px" src="https://github.com/user-attachments/assets/753ad9d7-92ce-4335-840b-3dd24d98c23f" /> **novel-ruby-remove** : Remove all ruby marks from selected text.
     * <img width="18" height="18" alt="novel-ruby-toggle-ruby-hidden_18px" src="https://github.com/user-attachments/assets/5e371d0d-66ff-48d9-b6e5-0fc6f44d86b7" /> **novel-ruby-toggle-ruby-hidden** : Toggle 'Hide ruby unless hover' setting.
-    * **novel-ruby-toggle-ruby-hidden-always** : Toggle 'Hide ruby' setting. Hides ruby completely, even on hover. This makes selection/copy clean, which is useful for dictionary lookup (OS dictionary, Yomitan).
+    * **novel-ruby-toggle-ruby-hidden-always** : Toggle 'Hide ruby when not editing' setting.
     * <img width="18" height="18" alt="novel-ruby-toggle-source-mode-render_18px" src="https://github.com/user-attachments/assets/a6010403-1882-4322-887b-9d429ff06daa" /> **novel-ruby-toggle-source-mode-render** : Toggle 'Enable ruby preview in source mode' setting.
 
 

@@ -29,7 +29,7 @@ export const convertNovelRuby = (element: Text, hide = false, hideAlways = false
 			const body = match.groups?.body1 ? match.groups.body1 : match.groups?.body2 ?? "";
 			// Set up ruby tag
 			const rubyNode = createEl('ruby', {
-				cls: hideAlways ? 'ruby ruby-hide ruby-hide-always' : hide ? 'ruby ruby-hide' : 'ruby',
+				cls: hideAlways ? 'ruby ruby-hide-always' : hide ? 'ruby ruby-hide' : 'ruby',
 				attr: { 'data-ruby-raw': match[0] }
 			});
 			rubyNode.createEl('rb' as keyof HTMLElementTagNameMap, { text: body });
@@ -63,7 +63,7 @@ export const convertNovelEmphasis = (element: Text, hide = false, hideAlways = f
 			});
 			for (const char of emphasisText) {
 				const rubyNode = container.createEl('ruby', {
-					cls: hideAlways ? 'ruby ruby-hide ruby-hide-always' : hide ? 'ruby ruby-hide' : 'ruby'
+					cls: hideAlways ? 'ruby ruby-hide-always' : hide ? 'ruby ruby-hide' : 'ruby'
 				});
 				rubyNode.createEl('rb' as keyof HTMLElementTagNameMap, { text: char });
 				rubyNode.createEl('rt', { text: dot });

@@ -9,6 +9,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: NovelRubyPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+		this.containerEl.addClass("novel-ruby-settings");
 	}
 
 	getSettingDefinitions(): Record<string, unknown>[] {
@@ -36,6 +37,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 					{
 						name: t("settings_hide_ruby_unless_hover_name"),
 						desc: t("settings_hide_ruby_unless_hover_desc"),
+						disabled: () => this.plugin.settings.hideRubyAlways,
 						control: { type: "toggle", key: "hideRuby" },
 					},
 					{
@@ -116,6 +118,11 @@ export class NovelRubySettingTab extends PluginSettingTab {
 		];
 	}
 
+	// Get the value of a control based on the key provided.
+	getControlValue(key: string): unknown {
+		return (this.plugin.settings as unknown as Record<string, unknown>)[key];
+	}
+
 	// Set the value of a control based on the key and value provided.
 	async setControlValue(key: string, value: unknown): Promise<void> {
 		switch (key) {
@@ -183,8 +190,13 @@ export class NovelRubySettingTab extends PluginSettingTab {
 			default:
 				return;
 		}
-		await this.plugin.saveSettings();
-		if (key === "modifyRubyCharacter") {
+		this.plugin.isUpdatingFromSettingsTab = true;
+		try {
+			await this.plugin.saveSettings();
+		} finally {
+			this.plugin.isUpdatingFromSettingsTab = false;
+		}
+		if (key === "modifyRubyCharacter" || key === "hideRubyAlways") {
 			(this as unknown as { refreshDomState(): void }).refreshDomState();
 		}
 	}
@@ -194,6 +206,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
+		containerEl.addClass("novel-ruby-settings");
 
 		new Setting(containerEl).setName(t("settings_display_title")).setHeading();
 
@@ -220,11 +233,13 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				})
 			);
 
-		new Setting(containerEl)
+		const hideRubyUnlessHoverSetting = new Setting(containerEl)
 			.setName(t("settings_hide_ruby_unless_hover_name"))
 			.setDesc(t("settings_hide_ruby_unless_hover_desc"))
+			.setDisabled(this.plugin.settings.hideRubyAlways)
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.hideRuby)
+				.setDisabled(this.plugin.settings.hideRubyAlways)
 				.onChange(async (value) => {
 					this.plugin.settings.hideRuby = value;
 					await this.plugin.saveSettings();
@@ -237,7 +252,18 @@ export class NovelRubySettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.hideRubyAlways)
 				.onChange(async (value) => {
 					this.plugin.settings.hideRubyAlways = value;
-					await this.plugin.saveSettings();
+					hideRubyUnlessHoverSetting.setDisabled(value);
+					hideRubyUnlessHoverSetting.components.forEach(c => {
+						if ('setDisabled' in c && typeof (c as { setDisabled: (d: boolean) => void }).setDisabled === 'function') {
+							(c as { setDisabled: (d: boolean) => void }).setDisabled(value);
+						}
+					});
+					this.plugin.isUpdatingFromSettingsTab = true;
+					try {
+						await this.plugin.saveSettings();
+					} finally {
+						this.plugin.isUpdatingFromSettingsTab = false;
+					}
 				}));
 
 		new Setting(containerEl)

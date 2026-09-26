@@ -23,7 +23,7 @@ class RubyWidget extends WidgetType {
 	toDOM(view: EditorView): HTMLElement {
 		const rubyEl = createEl("ruby", {
 			cls: this.hideAlways
-				? "novel-ruby ruby-hide ruby-hide-always"
+				? "novel-ruby ruby-hide-always"
 				: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
 		});
 		rubyEl.createEl("rb" as keyof HTMLElementTagNameMap, { text: this.body });
@@ -57,7 +57,7 @@ class EmphasisWidget extends WidgetType {
 		for (const char of this.text) {
 			const rubyEl = span.createEl("ruby", {
 				cls: this.hideAlways
-					? "novel-ruby ruby-hide ruby-hide-always"
+					? "novel-ruby ruby-hide-always"
 					: this.hide ? "novel-ruby ruby-hide" : "novel-ruby",
 			});
 			rubyEl.createEl("rb" as keyof HTMLElementTagNameMap, { text: char });

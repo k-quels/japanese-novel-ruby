@@ -88,12 +88,14 @@ const ICON_DATA = {
     'novel-ruby-insert-dot': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><circle cx="12" cy="6" r="0.8" fill="currentColor" /></svg>`,
     'novel-ruby-remove': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><rect x="6" y="3" width="12" height="5.5" rx="1" stroke-dasharray="1 2.5" /></svg>`,
     'novel-ruby-toggle-ruby-hidden': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><path d="M7 7h3" /><path d="M14 7h3" /></svg>`,
-    'novel-ruby-toggle-ruby-hidden-always': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21.5l5-9.5 5 9.8M8.5 19h7" /><path d="M6.5 4.5l11 6" /><path d="M17.5 4.5l-11 6" /></svg>`,
+    'novel-ruby-toggle-ruby-hidden-always': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2.4h3M14 2.4h3" /><path d="M2 6.55C6 5.7 9.7 5.57 12 7.94c2.3-2.37 6-2.24 10-1.39V20.38c-2.12-.85-7.71-.96-10 1.59-2.29-2.55-7.88-2.44-10-1.59Z" /><path d="M8.67 17.4 12 10.71l3.33 6.69M9.76 16.15h4.48" /></svg>`,
     'novel-ruby-toggle-source-mode-render': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m 7.5,21.0 4.5,-8.6 4.5,8.6 M 8.8,18.7 h 6.3" /><path d="M 7.2,7.1 H 10.0" /><path d="m 13.9,7.1 h 2.8" /><path d="M 5.1,13.0 1.0,17.2 5.1,21.3" /><path d="m 18.8,13.0 4.1,4.2 -4.1,4.1" /></svg>`
 };
 
 export default class NovelRubyPlugin extends Plugin {
 	settings: NovelRubyPluginSettings;
+	settingTab: NovelRubySettingTab;
+	isUpdatingFromSettingsTab = false;
 
 	async onload() {
 		await this.loadSettings();
@@ -263,7 +265,8 @@ export default class NovelRubyPlugin extends Plugin {
 		});
 
 		// Adds a settings tab
-		this.addSettingTab(new NovelRubySettingTab(this.app, this));
+		this.settingTab = new NovelRubySettingTab(this.app, this);
+		this.addSettingTab(this.settingTab);
 
 	}
 
@@ -329,6 +332,20 @@ export default class NovelRubyPlugin extends Plugin {
 		this.app.workspace.updateOptions();
 
 		this.refreshAllViews();
+
+		// Sync settings UI if settings tab is open and change originated from outside (commands, toolbar)
+		if (this.settingTab && !this.isUpdatingFromSettingsTab) {
+			const tabAny = this.settingTab as unknown as { update?: () => void; refreshDomState?: () => void };
+			if (typeof tabAny.update === "function") {
+				tabAny.update();
+			}
+			if (typeof tabAny.refreshDomState === "function") {
+				tabAny.refreshDomState();
+			}
+			if (typeof tabAny.update !== "function" && typeof tabAny.refreshDomState !== "function" && this.settingTab.containerEl.isShown()) {
+				this.settingTab.display();
+			}
+		}
 	}
 }
 
