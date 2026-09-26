@@ -335,12 +335,20 @@ export default class NovelRubyPlugin extends Plugin {
 
 		// Sync settings UI if settings tab is open and change originated from outside (commands, toolbar)
 		if (this.settingTab && !this.isUpdatingFromSettingsTab) {
-			const tabAny = this.settingTab as unknown as { update?: () => void; refreshDomState?: () => void };
+			const tabAny = this.settingTab as unknown as {
+				update?: () => void;
+				refreshDomState?: () => void;
+				updateDisabledSettingItems?: () => void;
+			};
 			if (typeof tabAny.update === "function") {
 				tabAny.update();
 			}
 			if (typeof tabAny.refreshDomState === "function") {
 				tabAny.refreshDomState();
+			}
+			if (typeof tabAny.updateDisabledSettingItems === "function") {
+				tabAny.updateDisabledSettingItems();
+				window.setTimeout(() => tabAny.updateDisabledSettingItems?.(), 0);
 			}
 			if (typeof tabAny.update !== "function" && typeof tabAny.refreshDomState !== "function" && this.settingTab.containerEl.isShown()) {
 				this.settingTab.display();

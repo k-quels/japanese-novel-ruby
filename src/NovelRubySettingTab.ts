@@ -198,7 +198,27 @@ export class NovelRubySettingTab extends PluginSettingTab {
 		}
 		if (key === "modifyRubyCharacter" || key === "hideRubyAlways") {
 			(this as unknown as { refreshDomState(): void }).refreshDomState();
+			this.updateDisabledSettingItems();
+			window.setTimeout(() => this.updateDisabledSettingItems(), 0);
 		}
+	}
+
+	updateDisabledSettingItems(): void {
+		this.containerEl.querySelectorAll<HTMLElement>(".setting-item").forEach((itemEl) => {
+			const hasDisabled = Boolean(
+				itemEl.querySelector(".setting-item-control .is-disabled, .setting-item-control [disabled], .setting-item-control input:disabled")
+			);
+			itemEl.classList.toggle("is-disabled", hasDisabled);
+		});
+	}
+
+	update(): void {
+		const superTab = PluginSettingTab.prototype as unknown as { update?: () => void };
+		if (typeof superTab.update === "function") {
+			superTab.update.call(this);
+		}
+		this.updateDisabledSettingItems();
+		window.setTimeout(() => this.updateDisabledSettingItems(), 0);
 	}
 
 	// Keep this for Obsidian 1.12 and earlier.
@@ -391,5 +411,7 @@ export class NovelRubySettingTab extends PluginSettingTab {
 						() => location.replace("https://buymeacoffee.com/quels"), 0
 					);
 				}));
+
+		this.updateDisabledSettingItems();
 	}
 }

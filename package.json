@@ -6,7 +6,10 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"lint:es": "eslint .",
+		"lint:css": "stylelint styles.css",
+		"lint": "npm run lint:es && npm run lint:css"
 	},
 	"keywords": [],
 	"author": "quels <@k-quels>",
@@ -20,6 +23,8 @@
 		"eslint": "^9.39.4",
 		"eslint-plugin-obsidianmd": "^0.4.2",
 		"obsidian": "latest",
+		"stylelint": "^17.15.0",
+		"stylelint-config-obsidianmd": "^0.1.0",
 		"tslib": "2.4.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.61.0"

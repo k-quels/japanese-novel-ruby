@@ -4,10 +4,14 @@ import obsidianmd from "eslint-plugin-obsidianmd";
 
 export default [
     {
-        ignores: ["**/node_modules/", "**/main.js"],
+        ignores: ["**/node_modules/", "**/main.js", "*.mjs"],
     },
     ...obsidianmd.configs.recommended,
     {
+        files: ["**/*.ts"],
+        plugins: {
+            "@typescript-eslint": tseslint.plugin,
+        },
         languageOptions: {
             globals: {
                 ...globals.node,

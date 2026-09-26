@@ -4,18 +4,17 @@ ruby > rt {
 }
 
 ruby.ruby-hide rt {
-	opacity: 0%;
-}
-
-ruby.ruby-hide:hover rt {
-	opacity: 100%;
+	opacity: 0;
 }
 
 ruby.ruby-hide-always rt {
 	display: none;
 }
 
-.novel-ruby-settings .setting-item:has(.is-disabled),
+ruby.ruby-hide:hover rt {
+	opacity: 1;
+}
+
 .novel-ruby-settings .setting-item.is-disabled {
 	opacity: 0.5;
 }
